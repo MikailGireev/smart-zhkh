@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 )
 
@@ -53,6 +54,10 @@ func RegisterUser(username, password string) error {
 		Password: password,
 	}
 
+	if err := newUser.Validate(); err != nil {
+		return err
+	}
+
 	users = append(users, newUser)
 	return SaveUsers(users)
 }
@@ -70,4 +75,14 @@ func LoginUser(username, password string) (*User, error) {
 	}
 
 	return nil, errors.New("invalid credentials")
+}
+
+func (u *User) Validate() error {
+	if u.Username == "" {
+		return fmt.Errorf("invalid username: %w", ErrValidation)
+	}
+	if u.Password == "" {
+		return fmt.Errorf("invalid password: %w", ErrValidation)
+	}
+	return nil
 }
