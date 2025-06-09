@@ -2,10 +2,17 @@ package auth
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
+	"net/http"
 	"os"
+	"smart-api/internal/httpx"
+	"strings"
 )
 
 const chargeFile = "./data/charges.json"
+
+var ErrValidation = errors.New("validation failed")
 
 func LoadCharges() ([]Charge, error) {
 	file, err := os.Open(chargeFile)
@@ -19,6 +26,7 @@ func LoadCharges() ([]Charge, error) {
 	if err != nil {
 		return []Charge{}, err
 	}
+
 	return charges, err
 }
 
@@ -37,8 +45,36 @@ func CreateCharge(newCharge Charge) error {
 	if err != nil {
 		return err
 	}
-	
+
+	if err := newCharge.Validate(); err != nil {
+		return err
+	}
+
 	newCharge.ID = len(charges) + 1
 	charges = append(charges, newCharge)
 	return SaveCharges(charges)
+}
+
+func (c *Charge) Validate() error {
+	if c.UserId <= 0 {
+		return fmt.Errorf("invalid user id: %w", ErrValidation)
+	}
+	if c.Amount <= 0 {
+		return fmt.Errorf("invalid amount: %w", ErrValidation)
+	}
+	if strings.TrimSpace(c.Category) == "" {
+		return fmt.Errorf("invalid category: %w", ErrValidation)
+	}
+	if strings.TrimSpace(c.Date) == "" {
+		return fmt.Errorf("invalid date: %w", ErrValidation)
+	}
+	return nil
+}
+
+func SendValidationError(w http.ResponseWriter, err error) {
+	httpx.NewJSONError(w, http.StatusBadRequest, "Validation failed", err.Error())
+}
+
+func IsValidationError(err error) bool {
+	return errors.Is(err, ErrValidation)
 }

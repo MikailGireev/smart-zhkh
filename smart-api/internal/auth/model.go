@@ -12,9 +12,9 @@ type User struct {
 }
 
 type Charge struct {
-	ID int `json:"id"`
-	UserId int `json:"user_id"`
-	Amount float64 `json:"amount"`
-	Date string `json:"date"`
+	ID       int    `json:"id"`
+	UserId   int    `json:"user_id"`
+	Amount   int    `json:"amount"`
+	Date     string `json:"date"`
 	Category string `json:"category"`
 }

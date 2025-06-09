@@ -48,11 +48,11 @@ func RegisterUser(username, password string) error {
 	}
 
 	newUser := User{
-		ID: len(users) + 1,
+		ID:       len(users) + 1,
 		Username: username,
 		Password: password,
 	}
-	
+
 	users = append(users, newUser)
 	return SaveUsers(users)
 }
@@ -63,7 +63,7 @@ func LoginUser(username, password string) (*User, error) {
 		return nil, err
 	}
 
-	for _, user  := range users {
+	for _, user := range users {
 		if user.Username == username && user.Password == password {
 			return &user, nil
 		}

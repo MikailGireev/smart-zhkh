@@ -4,22 +4,23 @@ import (
 	"encoding/json"
 	"net/http"
 	"smart-api/internal/auth"
+	"smart-api/internal/httpx"
 )
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		httpx.NewJSONError(w, http.StatusMethodNotAllowed, "Method not allowed", "Method not allowed")
 		return 
 	}
 
 	var req auth.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid request", "Invalid request")
 		return
 	}
 
 	if req.Username == "" || req.Password == "" {
-		http.Error(w, "Username and password are required", http.StatusBadRequest)
+		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid request", "Username and password are required")
 		return
 	}
 

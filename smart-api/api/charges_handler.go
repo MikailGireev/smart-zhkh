@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"smart-api/internal/auth"
+	"smart-api/internal/httpx"
 )
 
 func ChargesHandler(w http.ResponseWriter, r *http.Request) {
@@ -12,14 +13,14 @@ func ChargesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		httpx.NewJSONError(w, http.StatusMethodNotAllowed, "Method not allowed", "Method not allowed")
 		return
 	}
 
 	charges, err := auth.LoadCharges()
 	if err != nil {
 		fmt.Println("Failed to load charges:", err)
-		http.Error(w, "Failed to load charges", http.StatusInternalServerError)
+		httpx.NewJSONError(w, http.StatusInternalServerError, "Failed to load charges", err.Error())
 		return
 	}
 
@@ -31,19 +32,19 @@ func CreateChargeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		httpx.NewJSONError(w, http.StatusMethodNotAllowed, "Method not allowed", "Method not allowed")
 		return
 	}
 
 	var newCharge auth.Charge
 	if err := json.NewDecoder(r.Body).Decode(&newCharge); err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid request", "Invalid request")
 		return
 	}
 
 	charges, err := auth.LoadCharges()
 	if err != nil {
-		http.Error(w, "Не удалось загрузить начисления", http.StatusInternalServerError)
+		httpx.NewJSONError(w, http.StatusInternalServerError, "Failed to load charges", err.Error())
 		return
 	}
 
@@ -52,7 +53,7 @@ func CreateChargeHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = auth.SaveCharges(charges)
 	if err != nil {
-		http.Error(w, "Не удалось сохранить начисления", http.StatusInternalServerError)
+		httpx.NewJSONError(w, http.StatusInternalServerError, "Failed to save charges", err.Error())
 		return
 	}
 
