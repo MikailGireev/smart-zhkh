@@ -7,7 +7,8 @@
         <nav v-if="auth.isLoggedIn">
           <RouterLink to="/dashboard">Главная</RouterLink>
           <RouterLink to="/charges">Начисления</RouterLink>
-          <RouterLink to="/settings">Настройки</RouterLink>
+          <RouterLink to="/settings">Настройки</RouterLink
+          ><RouterLink to="/profile">Профиль</RouterLink>
           <button @click="logout">Выйти</button>
         </nav>
 

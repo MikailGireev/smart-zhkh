@@ -19,8 +19,8 @@ export async function createCharge(charge: {
   return await res.json();
 }
 
-export async function fetchCharges() {
-  const res = await fetch('http://localhost:8080/api/charges', {
+export async function fetchCharges(userId: number) {
+  const res = await fetch(`http://localhost:8080/api/charges?user_id=${userId}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

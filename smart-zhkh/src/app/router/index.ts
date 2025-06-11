@@ -5,6 +5,8 @@ import { Register } from '@/pages/register';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import { Charges, ChargesAdd } from '@/pages/charges';
+import { Profile, ProfileEdit } from '@/pages/profile';
+import { AddAccount } from '@/pages/account';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -42,6 +44,19 @@ const router = createRouter({
           path: '/charges/add',
           name: 'charges add',
           component: ChargesAdd,
+        },
+        {
+          path: '/profile',
+          name: 'profile',
+          component: Profile,
+        },
+        {
+          path: '/accounts/:id/edit',
+          component: ProfileEdit,
+        },
+        {
+          path: '/accounts/add',
+          component: AddAccount,
         },
       ],
     },

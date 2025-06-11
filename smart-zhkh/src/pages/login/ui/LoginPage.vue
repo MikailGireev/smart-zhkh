@@ -56,7 +56,10 @@ async function handleLogin() {
 
   try {
     const res = await loginUser(username.value, password.value);
-    auth.login(username.value, res.token || 'mock-token');
+
+    // 👇 обязательно передаём userId
+    auth.login(res.username, res.token || 'mock-token', res.userId);
+
     router.push('/dashboard');
   } catch (err: any) {
     message.value = '❌ ' + (err.message || 'Ошибка входа');

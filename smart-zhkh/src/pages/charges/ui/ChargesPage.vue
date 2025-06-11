@@ -29,7 +29,7 @@ const isLoading = ref(true);
 
 onMounted(async () => {
   try {
-    const data = await fetchCharges();
+    const data = await fetchCharges(auth.userId);
     charges.value = data;
     console.log('Загружены начисления:', data);
     console.log('auth.userId:', auth.userId);
@@ -41,9 +41,7 @@ onMounted(async () => {
 });
 
 // фильтруем только начисления текущего пользователя
-const filteredCharges = computed(() =>
-  charges.value.filter((c) => Number(c.user_id) === Number(auth.userId)),
-);
+const filteredCharges = computed(() => charges.value);
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString('ru-RU');
