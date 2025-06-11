@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"smart-api/internal/auth"
 	"smart-api/internal/httpx"
-	"strconv"
 	"strings"
 )
 
@@ -29,15 +28,9 @@ func AccountsHadlerGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID, err := strconv.Atoi(userIDParam)
-	if err != nil {
-		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid user_id", "Must be number")
-		return
-	}
-
 	var filtered []auth.Account
 	for _, acc := range accounts {
-		if acc.UserID == userID {
+		if acc.UserID == userIDParam {
 			filtered = append(filtered, acc)
 		}
 	}
@@ -81,11 +74,7 @@ func AccountsHandlerByUserID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID, err := strconv.Atoi(parts[3])
-	if err != nil {
-		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid user_id", "Must be number")
-		return
-	}
+	userID := parts[3]
 
 	result, err := GetAccounts(userID)
 	if err != nil {
@@ -97,7 +86,7 @@ func AccountsHandlerByUserID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-func GetAccounts(id int) ([]auth.Account, error) {
+func GetAccounts(id string) ([]auth.Account, error) {
 	accounts, err := auth.LoadAccounts()
 	if err != nil {
 		return nil, err

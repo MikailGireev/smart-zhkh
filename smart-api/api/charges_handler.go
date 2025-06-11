@@ -26,12 +26,6 @@ func ChargesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID, err := strconv.Atoi(userIDStr)
-	if err != nil || userID <= 0 {
-		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid user_id", "user_id must be a positive number")
-		return
-	}
-
 	charges, err := auth.LoadCharges()
 	if err != nil {
 		httpx.NewJSONError(w, http.StatusInternalServerError, "Failed to load charges", err.Error())
@@ -40,7 +34,7 @@ func ChargesHandler(w http.ResponseWriter, r *http.Request) {
 
 	var userCharges []auth.Charge
 	for _, c := range charges {
-		if c.UserId == userID {
+		if c.UserId == userIDStr {
 			userCharges = append(userCharges, c)
 		}
 	}

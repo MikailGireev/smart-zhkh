@@ -8,7 +8,6 @@ import (
 
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/api/register", api.RegisterHandler)
 	mux.HandleFunc("/api/login", api.LoginHandler)
 	mux.HandleFunc("/api/charges", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {

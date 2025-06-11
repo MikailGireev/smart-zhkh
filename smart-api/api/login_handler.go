@@ -2,38 +2,50 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"smart-api/internal/auth"
-	"smart-api/internal/httpx"
 )
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		httpx.NewJSONError(w, http.StatusMethodNotAllowed, "Method not allowed", "Method not allowed")
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var req auth.LoginRequest
+	var req LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid request", "Invalid request")
+		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
 
 	if req.Username == "" || req.Password == "" {
-		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid request", "Username and password are required")
+		http.Error(w, "Username and password are required", http.StatusBadRequest)
 		return
 	}
 
-	user, err := auth.LoginUser(req.Username, req.Password)
+	token, err := GetToken(req.Username, req.Password)
 	if err != nil {
-		httpx.NewJSONError(w, http.StatusUnauthorized, "Invalid credentials", err.Error())
+		http.Error(w, "Неверный логин или пароль", http.StatusUnauthorized)
 		return
+	}
+
+	claims, err := ExtractClaimsFromToken(token)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("ошибка извлечения claims: %v", err), http.StatusUnauthorized)
+		return
+	}
+	
+	err = auth.RegisterUser(claims.Sub, claims.PreferredUsername, " ")
+	if err != nil{
+		http.Error(w, "ошибка при добавлении персоны", http.StatusUnauthorized)
+		fmt.Println("jj")
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"token":    "fake-token-123",
-		"username": user.Username,
-		"userId":   user.ID,
+		"token":    token,
+		"username": claims.PreferredUsername,
+		"userId":   claims.Sub,
 	})
 }
