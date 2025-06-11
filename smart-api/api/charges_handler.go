@@ -2,10 +2,13 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"smart-api/internal/auth"
 	"smart-api/internal/httpx"
+	"strconv"
+	"strings"
 )
 
 func ChargesHandler(w http.ResponseWriter, r *http.Request) {
@@ -17,15 +20,34 @@ func ChargesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userIDStr := r.URL.Query().Get("user_id")
+	if userIDStr == "" {
+		httpx.NewJSONError(w, http.StatusBadRequest, "Missing user_id", "user_id is required")
+		return
+	}
+
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil || userID <= 0 {
+		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid user_id", "user_id must be a positive number")
+		return
+	}
+
 	charges, err := auth.LoadCharges()
 	if err != nil {
-		fmt.Println("Failed to load charges:", err)
 		httpx.NewJSONError(w, http.StatusInternalServerError, "Failed to load charges", err.Error())
 		return
 	}
 
-	json.NewEncoder(w).Encode(charges)
+	var userCharges []auth.Charge
+	for _, c := range charges {
+		if c.UserId == userID {
+			userCharges = append(userCharges, c)
+		}
+	}
+
+	json.NewEncoder(w).Encode(userCharges)
 }
+
 
 func CreateChargeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -58,4 +80,50 @@ func CreateChargeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(newCharge)
+}
+
+func ChargeHandlerByID(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		httpx.NewJSONError(w, http.StatusMethodNotAllowed, "Method not allowed", "Only GET allowed")
+		return
+	}
+
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) != 4 || parts[3] == "" {
+		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid path", "Expected /api/charges/{id}")
+		return
+	}
+
+	id, err := strconv.Atoi(parts[3])
+	if err != nil {
+		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid id", "Must be number")
+		return
+	}
+
+	charge, err := GetCharge(id)
+	if err != nil {
+		if errors.Is(err, auth.ErrNotFound) {
+			httpx.NewJSONError(w, http.StatusNotFound, "Charge not found", err.Error())
+			return
+		}
+		httpx.NewJSONError(w, http.StatusInternalServerError, "Failed to get charge", err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(charge)
+}
+
+func GetCharge(id int) (auth.Charge, error) {
+	charges, err := auth.LoadCharges()
+	if err != nil {
+		return auth.Charge{}, err
+	}
+
+	for _, charge := range charges {
+		if charge.ID == id {
+			return charge, nil
+		}
+	}
+	return auth.Charge{}, fmt.Errorf("charge not found: %w", auth.ErrNotFound)
 }

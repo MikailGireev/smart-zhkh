@@ -78,6 +78,12 @@ func LoginUser(username, password string) (*User, error) {
 }
 
 func (u *User) Validate() error {
+	if len(u.Username) < 2 {
+		return fmt.Errorf("username must be at least 2 characters: %w", ErrValidation)
+	}
+	if  len(u.Password) < 6 {
+		return fmt.Errorf("password must be at least 6 characters: %w", ErrValidation)
+	}
 	if u.Username == "" {
 		return fmt.Errorf("invalid username: %w", ErrValidation)
 	}

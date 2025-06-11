@@ -10,7 +10,7 @@ import (
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		httpx.NewJSONError(w, http.StatusMethodNotAllowed, "Method not allowed", "Method not allowed")
-		return 
+		return
 	}
 
 	var req auth.LoginRequest
@@ -24,12 +24,16 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user ,err := auth.LoginUser(req.Username, req.Password) 
+	user, err := auth.LoginUser(req.Username, req.Password)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpx.NewJSONError(w, http.StatusUnauthorized, "Invalid credentials", err.Error())
 		return
 	}
 
-	w.Header().Set("Content/type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"token": "fake-token-123", "username": user.Username})
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"token":    "fake-token-123",
+		"username": user.Username,
+		"userId":   user.ID,
+	})
 }

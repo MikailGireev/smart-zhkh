@@ -13,6 +13,7 @@ import (
 const chargeFile = "./data/charges.json"
 
 var ErrValidation = errors.New("validation failed")
+var ErrNotFound = errors.New("resource not found")
 
 func LoadCharges() ([]Charge, error) {
 	file, err := os.Open(chargeFile)
