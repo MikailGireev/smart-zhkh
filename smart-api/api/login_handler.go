@@ -2,17 +2,17 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
-	"smart-api/internal/auth"
 )
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return 
+		return
 	}
 
-	var req auth.LoginRequest
+	var req LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
@@ -23,12 +23,23 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user ,err := auth.LoginUser(req.Username, req.Password) 
+	token, err := GetToken(req.Username, req.Password)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Не правильный Логин или Пароль", http.StatusUnauthorized)
 		return
 	}
 
-	w.Header().Set("Content/type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"token": "fake-token-123", "username": user.Username})
+	username, err := ExtractUsernameFromToken(token)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("ошибка извлечения username: %v", err), http.StatusUnauthorized)
+		return
+	}
+
+	response := LoginResponse{
+		Token:    token,
+		Username: username,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }
