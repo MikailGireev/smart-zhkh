@@ -1,6 +1,6 @@
 <template>
   <div class="profile-container">
-    <h2>Профиль</h2>
+    <h2>👤 Профиль</h2>
 
     <div class="user-info">
       <p><strong>Пользователь:</strong> {{ auth.username }}</p>
@@ -8,9 +8,9 @@
 
     <h3>Ваши счета</h3>
 
-    <div v-if="isLoading">Загрузка...</div>
+    <div v-if="isLoading" class="loading">Загрузка...</div>
 
-    <div v-else-if="filteredAccounts.length === 0">
+    <div v-else-if="filteredAccounts.length === 0" class="empty-state">
       <p>У вас пока нет заполненного профиля.</p>
       <RouterLink to="/accounts/add" class="add-profile-button">📝 Заполнить профиль</RouterLink>
     </div>
@@ -54,52 +54,108 @@ const filteredAccounts = computed(() =>
 
 <style scoped>
 .profile-container {
-  max-width: 700px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: linear-gradient(to bottom right, #f9fafb, #e0f2fe);
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.4s ease;
+}
+
+h2 {
+  font-size: 28px;
+  color: #0f172a;
+  margin-bottom: 1.5rem;
+}
+
+h3 {
+  font-size: 22px;
+  margin-bottom: 1rem;
+  color: #1e293b;
 }
 
 .user-info {
   margin-bottom: 2rem;
-}
-
-.account-list {
-  display: grid;
-  gap: 1rem;
-}
-
-.account-card {
-  background: #f8fafc;
-  border-radius: 8px;
+  background: #f1f5f9;
   padding: 1rem;
-  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #334155;
+  border-left: 5px solid #2563eb;
 }
 
-.edit-link {
-  display: inline-block;
-  margin-top: 0.5rem;
-  color: #2563eb;
-  font-size: 0.9rem;
+.loading {
+  text-align: center;
+  font-weight: 500;
+  color: #64748b;
 }
 
-.edit-link:hover {
-  text-decoration: underline;
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  background: #fff1f2;
+  border: 1px dashed #fca5a5;
+  border-radius: 12px;
+  color: #b91c1c;
 }
 
 .add-profile-button {
   display: inline-block;
-  padding: 0.5rem 1rem;
   margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
   background: #10b981;
   color: white;
-  border-radius: 6px;
+  border-radius: 8px;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
+  transition: background 0.3s;
 }
+
 .add-profile-button:hover {
   background: #059669;
+}
+
+.account-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.account-card {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s;
+}
+
+.account-card:hover {
+  transform: translateY(-4px);
+}
+
+.edit-link {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: #3b82f6;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: color 0.3s;
+}
+
+.edit-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

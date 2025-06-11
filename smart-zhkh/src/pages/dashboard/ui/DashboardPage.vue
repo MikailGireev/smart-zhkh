@@ -6,7 +6,7 @@
     <div class="card-grid">
       <RouterLink to="/charges" class="info-card">💳 Мои начисления</RouterLink>
       <div class="info-card">🏠 Устройства (в разработке)</div>
-      <div class="info-card">👤 Профиль (в разработке)</div>
+      <RouterLink to="/profile" class="info-card">👤 Профиль</RouterLink>
     </div>
   </div>
 </template>
@@ -28,40 +28,66 @@ onMounted(() => {
 
 <style scoped>
 .dashboard-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.04);
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.6s ease;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 h2 {
-  font-size: 26px;
-  margin-bottom: 1rem;
-  color: #1e293b;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
 }
+
 p {
-  color: #4b5563;
+  font-size: 16px;
+  color: #64748b;
   margin-bottom: 2rem;
 }
+
 .card-grid {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
+
 .info-card {
-  padding: 1.5rem;
-  background: #f1f5f9;
-  border-radius: 8px;
+  background: white;
+  padding: 1.75rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
   text-align: center;
-  font-size: 16px;
-  font-weight: 500;
-  color: #334155;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-  transition: 0.2s;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease;
+  border: 2px solid transparent;
+  text-decoration: none;
 }
+
 .info-card:hover {
-  background: #e2e8f0;
+  transform: translateY(-4px);
+  background: #f0f9ff;
+  border-color: #38bdf8;
+  color: #0c4a6e;
+  box-shadow: 0 8px 20px rgba(14, 165, 233, 0.15);
 }
 </style>
