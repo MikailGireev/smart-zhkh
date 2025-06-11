@@ -34,7 +34,7 @@ func AccountsHadlerGet(w http.ResponseWriter, r *http.Request) {
 			filtered = append(filtered, acc)
 		}
 	}
-
+	
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(filtered)
 }

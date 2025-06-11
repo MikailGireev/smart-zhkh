@@ -48,7 +48,7 @@ onMounted(async () => {
 });
 
 const filteredAccounts = computed(() =>
-  accounts.value.filter((acc) => Number(acc.user_id) === Number(auth.userId)),
+  accounts.value.filter((acc) => String(acc.user_id) === String(auth.userId)),
 );
 </script>
 

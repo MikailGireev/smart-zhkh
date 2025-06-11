@@ -4,11 +4,11 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     username: localStorage.getItem('username') || '',
     token: localStorage.getItem('token') || '',
-    userId: Number(localStorage.getItem('userId')) || 0,
+    userId: localStorage.getItem('userId') || '',
   }),
 
   actions: {
-    login(username: string, token: string, userId: number) {
+    login(username: string, token: string, userId: string) {
       this.username = username;
       this.token = token;
       this.userId = userId;
@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth', {
     logout() {
       this.username = '';
       this.token = '';
-      this.userId = 0;
+      this.userId = '';
 
       localStorage.removeItem('username');
       localStorage.removeItem('token');

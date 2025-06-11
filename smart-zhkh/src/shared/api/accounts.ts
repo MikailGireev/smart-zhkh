@@ -29,7 +29,7 @@ export async function updateAccount(account: any) {
   return await res.json();
 }
 export async function createAccount(account: {
-  user_id: number;
+  user_id: string;
   account_number: string;
   full_name: string;
   address: string;
