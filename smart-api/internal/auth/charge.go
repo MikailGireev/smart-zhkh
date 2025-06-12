@@ -73,13 +73,31 @@ func (c *Charge) Validate() error {
 	return nil
 }
 
-func Payding(ch Charge) error {
-	jsonData, err := json.Marshal(ch)
+func PaydingFunc(ch Charge) error {
+	us, _ := LoadUser()
+
+	var anem string
+	for _, elem := range us{
+		if elem.ID == ch.UserId{
+			anem = elem.Username
+		}
+	}
+	Paid := Paidin{
+		Name: anem,
+		User_id: ch.UserId,
+		Data: ch.Date,
+		Category: ch.Category,
+		Amount: ch.Amount,
+		Qr_data: "https://example.com/payment?invoice=INV-TEST-2025-06-003&amount=13000.75",
+	}
+
+	jsonData, err := json.Marshal(Paid)
 	if err != nil{
 		return err
 	}
 
-	_, err = http.Post("https://localhost:8001/generate-receipt", "application/json", bytes.NewBuffer(jsonData))
+	fmt.Println(Paid)
+	_, err = http.Post("http://localhost:8001/generate-receipt", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil{
 		return err
 	}

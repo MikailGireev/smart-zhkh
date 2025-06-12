@@ -129,21 +129,52 @@ func ChargesHandlerPut(w http.ResponseWriter, r *http.Request) {
 
 	charges, err := auth.LoadCharges()
 	if err != nil {
-		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid request", "Not foun charges")
+		httpx.NewJSONError(w, http.StatusInternalServerError, "Failed to load charges", err.Error())
 		return
 	}
 
-	var charge auth.Charge
-	if err := json.NewDecoder(r.Body).Decode(&charge); err != nil {
-		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid request", "Invalid request")
+	var updatedCharge auth.Charge
+	if err := json.NewDecoder(r.Body).Decode(&updatedCharge); err != nil {
+		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid request", "Invalid JSON body")
 		return
 	}
 
-	for _, c := range charges {
-		if c.ID == charge.ID && c.UserId == charge.UserId {
-			c.Paid = true
-			fmt.Println(auth.Payding(c))
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) < 4 {
+		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid path", "Expected /api/charges/{id}")
+		return
+	}
+
+	idStr := parts[3]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid id", "ID must be integer")
+		return
+	}
+
+	updated := false
+
+	for i, c := range charges {
+		if c.ID == id {
+			charges[i].Paid = true
+			updatedCharge = charges[i]
+			updated = true
+			break
 		}
 	}
-	auth.SaveCharges(charges)
+
+	if !updated {
+		httpx.NewJSONError(w, http.StatusNotFound, "Charge not found", "No matching charge found")
+		return
+	}
+
+	if err := auth.SaveCharges(charges); err != nil {
+		httpx.NewJSONError(w, http.StatusInternalServerError, "Failed to save charges", err.Error())
+		return
+	}
+
+	auth.PaydingFunc(updatedCharge)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(updatedCharge)
 }
