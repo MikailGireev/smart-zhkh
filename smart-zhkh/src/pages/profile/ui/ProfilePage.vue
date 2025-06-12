@@ -21,6 +21,7 @@
         <p><strong>ФИО:</strong> {{ acc.full_name }}</p>
         <p><strong>Адрес:</strong> {{ acc.address }}</p>
         <p><strong>Площадь:</strong> {{ acc.area }} м²</p>
+        <p><strong>Id:</strong> {{ acc.id }}</p>
         <RouterLink :to="`/accounts/${acc.id}/edit`" class="edit-link">✏️ Редактировать</RouterLink>
       </div>
     </div>

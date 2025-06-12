@@ -2,33 +2,9 @@
     {
         "id": 1,
         "user_id": "f3af15a0-9ee1-4409-aa82-82e6eebe97cf",
-        "account_number": "1245",
-        "full_name": "гага",
-        "address": "гагаг",
-        "area": 124
-    },
-    {
-        "id": 2,
-        "user_id": "fc07f38e-5d3e-463f-a49f-241e03443551",
-        "account_number": "234",
-        "full_name": "гага",
-        "address": "гага",
-        "area": 23
-    },
-    {
-        "id": 3,
-        "user_id": "f3af15a0-9ee1-4409-aa82-82e6eebe97cf",
-        "account_number": "12432",
-        "full_name": "гагага",
-        "address": "гаагг",
-        "area": 45
-    },
-    {
-        "id": 4,
-        "user_id": "f3af15a0-9ee1-4409-aa82-82e6eebe97cf",
-        "account_number": "1324",
-        "full_name": "ruru",
-        "address": "ruur",
-        "area": 13
+        "account_number": "235",
+        "full_name": "dsgsd",
+        "address": "fsdfv",
+        "area": 123
     }
 ]
