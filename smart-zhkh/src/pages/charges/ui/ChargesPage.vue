@@ -7,6 +7,11 @@ const auth = useAuthStore();
 const charges = ref<any[]>([]);
 const isLoading = ref(true);
 
+const showModal = ref(false);
+const selectedChargeId = ref<number | null>(null);
+const cardNumber = ref('');
+const cvv = ref('');
+
 onMounted(async () => {
   try {
     charges.value = await fetchCharges(auth.userId);
@@ -17,7 +22,20 @@ onMounted(async () => {
   }
 });
 
-const filteredCharges = computed(() => charges.value);
+const unpaidCharges = computed(() => charges.value.filter((c) => !c.paid));
+const paidCharges = computed(() => charges.value.filter((c) => c.paid));
+
+async function payCharge(id: number) {
+  const charge = charges.value.find((c) => c.id === id);
+  if (!charge) return;
+
+  try {
+    await updateCharge({ ...charge, paid: true });
+    charge.paid = true;
+  } catch (e) {
+    console.error('Ошибка оплаты:', e);
+  }
+}
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString('ru-RU');
@@ -29,19 +47,24 @@ function formatDate(date: string) {
     <div class="charges-header">
       <h2 class="charges-title">Ваши начисления</h2>
       <RouterLink to="/charges/add" class="btn btn-primary add-button">
-        <svg viewBox="0 0 24 24" class="btn-icon" aria-hidden="true">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-        <span>Добавить</span>
+        <span>+ Добавить</span>
       </RouterLink>
     </div>
 
     <div v-if="isLoading" class="loading">У вас нет зачислений</div>
 
-    <div v-else-if="filteredCharges.length === 0" class="empty-state">
-      <p>Пока нет начислений</p>
-    </div>
+    <div v-else>
+      <div v-if="unpaidCharges.length > 0">
+        <h3>Неоплаченные</h3>
+        <div class="card-grid">
+          <div v-for="charge in unpaidCharges" :key="charge.id" class="charge-card">
+            <h3 class="category">{{ charge.category }}</h3>
+            <p class="amount">💰 {{ charge.amount }} ₽</p>
+            <p class="date">📅 {{ formatDate(charge.date) }}</p>
+            <button @click="payCharge(charge.id)" class="pay-button">💳 Оплатить</button>
+          </div>
+        </div>
+      </div>
 
     <div v-else class="card-grid">
       <div v-for="charge in filteredCharges" :key="charge.id" class="charge-card">
@@ -56,6 +79,24 @@ function formatDate(date: string) {
       </div>
     </div>
   </div>
+
+  <!-- 💳 Модальное окно оплаты -->
+  <teleport to="body">
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Оплата начисления</h3>
+        <label>Номер карты</label>
+        <input v-model="cardNumber" type="text" placeholder="0000 0000 0000 0000" maxlength="19" />
+        <label>CVV</label>
+        <input v-model="cvv" type="text" placeholder="123" maxlength="3" />
+
+        <div class="modal-actions">
+          <button class="confirm" @click="confirmPayment">Подтвердить</button>
+          <button class="cancel" @click="showModal = false">Отмена</button>
+        </div>
+      </div>
+    </div>
+  </teleport>
 </template>
 
 <style scoped>
@@ -206,6 +247,102 @@ function formatDate(date: string) {
 .date {
   font-size: 0.875rem;
   color: var(--color-text-dark);
+}
+
+.success-message {
+  margin-bottom: 1rem;
+  color: #16a34a;
+  font-weight: 500;
+}
+
+.pay-button {
+  background: #22c55e;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+.pay-button:hover {
+  background: #16a34a;
+}
+
+.confirm {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+}
+.cancel {
+  background: transparent;
+  color: #64748b;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+}
+
+.charges-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.04);
+}
+
+.charges-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.charge-card {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+.charge-card.paid {
+  background: #e0fce0;
+  border: 1px solid #22c55e;
+}
+
+.category {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.amount,
+.date {
+  margin: 0.25rem 0;
+}
+
+.status {
+  color: #16a34a;
+  font-weight: 500;
+}
+
+.pay-button {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.pay-button:hover {
+  background: #2563eb;
 }
 
 @keyframes cardEntrance {
