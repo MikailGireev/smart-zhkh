@@ -1,1 +1,10 @@
-[{"id":1,"user_id":1,"account_number":"12345678","full_name":"Гиреев Микаил Магомедович","address":"Плиево","area":100}]
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "account_number": "12345678",
+    "full_name": "Гиреев Микаил Магомедович",
+    "address": "Плиево",
+    "area": 100
+  }
+]
