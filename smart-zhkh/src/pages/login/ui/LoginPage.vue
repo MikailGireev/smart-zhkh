@@ -1,50 +1,3 @@
-<template>
-  <div class="page-wrapper">
-    <div class="form-card container">
-      <!-- Иконка замка -->
-      <svg viewBox="0 0 24 24" class="form-icon" aria-hidden="true">
-        <rect x="5" y="11" width="14" height="10" rx="2" ry="2" />
-        <path d="M12 11V7a4 4 0 0 0-8 0v4" />
-        <path d="M12 11V7a4 4 0 0 1 8 0v4" />
-      </svg>
-
-      <h1 class="form-title">Вход в систему</h1>
-
-      <form @submit.prevent="handleLogin" novalidate>
-        <div class="form-group">
-          <label for="username">Логин</label>
-          <input
-            v-model="username"
-            id="username"
-            type="text"
-            placeholder="Введите логин"
-            class="form-input"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="password">Пароль</label>
-          <input
-            v-model="password"
-            id="password"
-            type="password"
-            placeholder="Введите пароль"
-            class="form-input"
-          />
-        </div>
-
-        <button type="submit" class="submit-button btn-primary">🔒 Войти</button>
-      </form>
-
-      <ul v-if="errors.length" class="errors">
-        <li v-for="(err, i) in errors" :key="i">{{ err }}</li>
-      </ul>
-
-      <p v-if="message" class="message">{{ message }}</p>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 // пока скрипт не используется, но оставлен по стандарту
 import { ref } from 'vue';
@@ -80,19 +33,66 @@ async function handleLogin() {
 }
 </script>
 
+<template>
+  <div class="page-wrapper container">
+    <div class="form-card">
+      <!-- Иконка замка -->
+      <svg viewBox="0 0 24 24" class="form-icon" aria-hidden="true">
+        <rect x="5" y="11" width="14" height="10" rx="2" ry="2" />
+        <path d="M12 11V7a4 4 0 0 0-8 0v4" />
+        <path d="M12 11V7a4 4 0 0 1 8 0v4" />
+      </svg>
+
+      <h1 class="form-title">Вход в систему</h1>
+
+      <form @submit.prevent="handleLogin" novalidate>
+        <div class="form-group">
+          <label for="username">Логин</label>
+          <input
+            v-model="username"
+            id="username"
+            type="text"
+            placeholder="Введите логин"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Пароль</label>
+          <input
+            v-model="password"
+            id="password"
+            type="password"
+            placeholder="Введите пароль"
+            class="form-input"
+          />
+        </div>
+
+        <button type="submit" class="submit-button">🔒 Войти</button>
+      </form>
+
+      <ul v-if="errors.length" class="errors">
+        <li v-for="(err, i) in errors" :key="i">{{ err }}</li>
+      </ul>
+
+      <p v-if="message" class="message">{{ message }}</p>
+    </div>
+  </div>
+</template>
+
 <style scoped>
 .page-wrapper {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--color-bg-light);
-  animation: fadeIn 0.6s ease;
   padding: 1rem;
+  background: linear-gradient(145deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+  color: var(--color-text-light);
 }
 
 .form-card {
-  background: var(--color-text-light);
+  background: var(--color-bg-light);
   padding: 2.5rem 3rem;
   border-radius: 1rem;
   width: 100%;
@@ -141,10 +141,11 @@ label {
   border: 1px solid var(--color-primary-light);
   border-radius: 0.5rem;
   font-size: 1rem;
+  background: var(--color-text-light);
   transition: var(--transition-default);
 }
 .form-input:focus {
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-dark);
   outline: none;
   background: var(--color-bg-light);
 }
@@ -152,10 +153,16 @@ label {
 .submit-button {
   width: 100%;
   padding: 0.75rem;
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+  border: none;
   border-radius: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
   transition: var(--transition-default);
+}
+.submit-button:hover {
+  background-color: var(--color-primary-dark);
 }
 
 .errors {
@@ -173,15 +180,6 @@ label {
   font-weight: 500;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    background-color: var(--color-bg-light);
-  }
-  to {
-    opacity: 1;
-  }
-}
 @keyframes slideUp {
   from {
     transform: translateY(20px);

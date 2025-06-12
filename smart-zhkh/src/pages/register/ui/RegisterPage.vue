@@ -1,47 +1,6 @@
-<script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/shared/store/auth';
-import { registerUser } from '@/shared/api';
-
-const router = useRouter();
-const auth = useAuthStore();
-
-const username = ref('');
-const password = ref('');
-const confirmPassword = ref('');
-const errors = ref<string[]>([]);
-const message = ref('');
-
-async function handleRegister() {
-  errors.value = [];
-  message.value = '';
-
-  if (!username.value.trim()) {
-    errors.value.push('Введите логин');
-  }
-  if (password.value.length < 6) {
-    errors.value.push('Пароль должен быть не менее 6 символов');
-  }
-  if (password.value !== confirmPassword.value) {
-    errors.value.push('Пароли не совпадают');
-  }
-  if (errors.value.length) return;
-
-  try {
-    await registerUser(username.value, password.value);
-    message.value = '✅ Регистрация прошла успешно';
-    auth.login(username.value, 'fake-token', auth.userId);
-    router.push('/dashboard');
-  } catch (err: any) {
-    message.value = err.message || 'Ошибка регистрации';
-  }
-}
-</script>
-
 <template>
-  <div class="page-wrapper">
-    <div class="form-card container">
+  <div class="page-wrapper container">
+    <div class="form-card">
       <!-- Иконка регистрации -->
       <svg viewBox="0 0 24 24" class="form-icon" aria-hidden="true">
         <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4 0-7 3-7 5v3h14v-3c0-2-3-5-7-5z" />
@@ -97,19 +56,60 @@ async function handleRegister() {
   </div>
 </template>
 
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/shared/store/auth';
+import { registerUser } from '@/shared/api';
+
+const router = useRouter();
+const auth = useAuthStore();
+
+const username = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+const errors = ref<string[]>([]);
+const message = ref('');
+
+async function handleRegister() {
+  errors.value = [];
+  message.value = '';
+
+  if (!username.value.trim()) {
+    errors.value.push('Введите логин');
+  }
+  if (password.value.length < 6) {
+    errors.value.push('Пароль должен быть не менее 6 символов');
+  }
+  if (password.value !== confirmPassword.value) {
+    errors.value.push('Пароли не совпадают');
+  }
+  if (errors.value.length) return;
+
+  try {
+    await registerUser(username.value, password.value);
+    message.value = '✅ Регистрация прошла успешно';
+    auth.login(username.value, 'fake-token', auth.userId);
+    router.push('/dashboard');
+  } catch (err: any) {
+    message.value = err.message || 'Ошибка регистрации';
+  }
+}
+</script>
+
 <style scoped>
 .page-wrapper {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, var(--color-bg-light) 0%, var(--color-primary-light) 100%);
-  animation: fadeIn 0.6s ease;
   padding: 1rem;
+  /* Градиент из базовых цветов primary */
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
 }
 
 .form-card {
-  background: var(--color-text-light);
+  background: var(--color-bg-light);
   padding: 2.5rem 3rem;
   border-radius: 1rem;
   width: 100%;
@@ -117,7 +117,7 @@ async function handleRegister() {
   box-shadow: var(--shadow-lg);
   animation: slideUp 0.5s ease;
   text-align: center;
-  position: relative;
+  color: var(--color-text-dark);
 }
 
 .form-icon {
@@ -136,7 +136,7 @@ async function handleRegister() {
 .form-title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--color-primary-dark);
+  color: var(--color-primary);
   margin-bottom: 1.5rem;
 }
 
@@ -155,15 +155,15 @@ label {
 .form-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--color-primary-light);
+  border: 1px solid var(--color-primary);
   border-radius: 0.5rem;
   font-size: 1rem;
   transition: var(--transition-default);
 }
 .form-input:focus {
-  border-color: var(--color-primary);
-  outline: none;
+  border-color: var(--color-primary-dark);
   background: var(--color-bg-light);
+  outline: none;
 }
 
 .submit-button {
@@ -173,6 +173,11 @@ label {
   font-size: 1rem;
   font-weight: 600;
   transition: var(--transition-default);
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+}
+.submit-button:hover {
+  background-color: var(--color-primary-dark);
 }
 
 .errors {
@@ -196,16 +201,6 @@ label {
   font-weight: 500;
 }
 
-/* Анимации */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    background-color: var(--color-bg-light);
-  }
-  to {
-    opacity: 1;
-  }
-}
 @keyframes slideUp {
   from {
     transform: translateY(20px);
