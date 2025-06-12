@@ -1,11 +1,24 @@
 <template>
-  <div class="add-charge-container">
-    <h2>➕ Добавить новое начисление</h2>
+  <div class="add-charge-container container">
+    <h2 class="add-charge-title">
+      <svg viewBox="0 0 24 24" class="add-icon" aria-hidden="true">
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+      Добавить новое начисление
+    </h2>
 
-    <form @submit.prevent="submitForm">
+    <form @submit.prevent="submitForm" class="add-charge-form">
       <div class="form-group">
         <label for="category">📂 Категория</label>
-        <input v-model="category" id="category" type="text" required placeholder="Например: Вода" />
+        <input
+          v-model="category"
+          id="category"
+          type="text"
+          required
+          placeholder="Например: Вода"
+          class="form-input"
+        />
       </div>
 
       <div class="form-group">
@@ -17,15 +30,18 @@
           min="0"
           required
           placeholder="Введите сумму"
+          class="form-input"
         />
       </div>
 
       <div class="form-group">
         <label for="date">📅 Дата</label>
-        <input v-model="date" id="date" type="date" required />
+        <input v-model="date" id="date" type="date" required class="form-input" />
       </div>
 
-      <button type="submit" class="submit-button">Добавить</button>
+      <button type="submit" class="btn btn-primary submit-button">
+        <span>Добавить</span>
+      </button>
     </form>
 
     <p v-if="message" class="message">{{ message }}</p>
@@ -34,9 +50,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/shared/store/auth';
 import { createCharge } from '@/shared/api/charges';
-import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const auth = useAuthStore();
@@ -49,16 +65,13 @@ const message = ref('');
 async function submitForm() {
   try {
     await createCharge({
-      user_id: auth.userId,
+      user_id: Number(auth.userId),
       category: category.value,
       amount: amount.value,
       date: date.value,
     });
-
     message.value = '✅ Начисление добавлено!';
-    setTimeout(() => {
-      router.push('/charges');
-    }, 1000);
+    setTimeout(() => router.push('/charges'), 800);
   } catch (e) {
     message.value = '❌ Ошибка при добавлении начисления';
   }
@@ -67,75 +80,75 @@ async function submitForm() {
 
 <style scoped>
 .add-charge-container {
-  max-width: 520px;
   margin: 3rem auto;
-  padding: 2.5rem;
-  background: linear-gradient(to bottom right, #ffffff, #f0f9ff);
-  border-radius: 16px;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.06);
-  animation: fadeIn 0.3s ease;
+  padding: 2.5rem 1.5rem;
+  background: var(--color-bg-light);
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn 0.4s ease;
 }
 
-h2 {
-  font-size: 24px;
-  color: #0f172a;
+.add-charge-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  color: var(--color-primary-dark);
   margin-bottom: 1.5rem;
-  text-align: center;
 }
 
-form {
+.add-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  stroke: var(--color-primary);
+  stroke-width: 2;
+  fill: none;
+  transition: var(--transition-default);
+}
+.add-icon:hover {
+  transform: scale(1.1);
+}
+
+.add-charge-form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-label {
-  font-weight: 600;
+.form-group label {
+  display: block;
   margin-bottom: 0.5rem;
-  color: #334155;
+  font-weight: 600;
+  color: var(--color-text-dark);
 }
 
-input {
-  padding: 0.6rem 0.75rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 16px;
-  background: white;
-  transition: 0.2s;
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-primary-light);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: var(--transition-default);
 }
-input:focus {
-  border-color: #3b82f6;
+.form-input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-bg-light);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .submit-button {
-  background-color: #10b981;
-  color: white;
-  padding: 0.75rem;
-  font-size: 16px;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.submit-button:hover {
-  background-color: #059669;
+  align-self: flex-end;
+  padding: 0.75rem 1.5rem;
 }
 
 .message {
   margin-top: 1.5rem;
+  font-weight: 500;
+  color: var(--color-success);
   text-align: center;
-  font-weight: 600;
-  color: #22c55e;
 }
 
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -144,6 +157,29 @@ input:focus {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .add-charge-container {
+    padding: 2rem 1rem;
+  }
+  .add-charge-title {
+    font-size: 1.25rem;
+  }
+  .submit-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-input {
+    font-size: 0.95rem;
+    padding: 0.6rem 0.8rem;
+  }
+  .add-charge-title {
+    font-size: 1.125rem;
   }
 }
 </style>

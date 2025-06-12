@@ -1,24 +1,43 @@
 <template>
   <div class="page-wrapper">
-    <div class="form-card">
-      <h1>Вход в систему</h1>
+    <div class="form-card container">
+      <!-- Иконка замка -->
+      <svg viewBox="0 0 24 24" class="form-icon" aria-hidden="true">
+        <rect x="5" y="11" width="14" height="10" rx="2" ry="2" />
+        <path d="M12 11V7a4 4 0 0 0-8 0v4" />
+        <path d="M12 11V7a4 4 0 0 1 8 0v4" />
+      </svg>
 
-      <form @submit.prevent="handleLogin">
+      <h1 class="form-title">Вход в систему</h1>
+
+      <form @submit.prevent="handleLogin" novalidate>
         <div class="form-group">
           <label for="username">Логин</label>
-          <input v-model="username" id="username" type="text" placeholder="Введите логин" />
+          <input
+            v-model="username"
+            id="username"
+            type="text"
+            placeholder="Введите логин"
+            class="form-input"
+          />
         </div>
 
         <div class="form-group">
           <label for="password">Пароль</label>
-          <input v-model="password" id="password" type="password" placeholder="Введите пароль" />
+          <input
+            v-model="password"
+            id="password"
+            type="password"
+            placeholder="Введите пароль"
+            class="form-input"
+          />
         </div>
 
-        <button type="submit" class="submit-button">➡️ Войти</button>
+        <button type="submit" class="submit-button btn-primary">🔒 Войти</button>
       </form>
 
       <ul v-if="errors.length" class="errors">
-        <li v-for="(err, index) in errors" :key="index">{{ err }}</li>
+        <li v-for="(err, i) in errors" :key="i">{{ err }}</li>
       </ul>
 
       <p v-if="message" class="message">{{ message }}</p>
@@ -27,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+// пока скрипт не используется, но оставлен по стандарту
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/shared/store/auth';
@@ -42,16 +62,17 @@ const router = useRouter();
 
 async function handleLogin() {
   errors.value = [];
+  message.value = '';
 
-  if (username.value.trim() === '') errors.value.push('Введите логин');
-  if (password.value.trim() === '') errors.value.push('Введите пароль');
-  else if (password.value.length < 6) errors.value.push('Пароль должен быть от 6 символов');
+  if (!username.value.trim()) errors.value.push('Введите логин');
+  if (!password.value.trim()) errors.value.push('Введите пароль');
+  else if (password.value.length < 6) errors.value.push('Пароль должен быть не менее 6 символов');
 
-  if (errors.value.length > 0) return;
+  if (errors.value.length) return;
 
   try {
     const res = await loginUser(username.value, password.value);
-    auth.login(res.username, res.token || 'mock-token', res.userId); // обязательно userId
+    auth.login(res.username, res.token || 'mock-token', res.userId);
     router.push('/dashboard');
   } catch (err: any) {
     message.value = '❌ ' + (err.message || 'Ошибка входа');
@@ -65,94 +86,102 @@ async function handleLogin() {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
+  background: var(--color-bg-light);
   animation: fadeIn 0.6s ease;
+  padding: 1rem;
 }
 
 .form-card {
-  background: white;
-  padding: 2.5rem;
-  border-radius: 16px;
+  background: var(--color-text-light);
+  padding: 2.5rem 3rem;
+  border-radius: 1rem;
   width: 100%;
-  max-width: 420px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  box-shadow: var(--shadow-lg);
   animation: slideUp 0.5s ease;
+  text-align: center;
+  position: relative;
 }
 
-h1 {
-  margin-bottom: 2rem;
-  text-align: center;
-  font-size: 28px;
-  color: #1e40af;
+.form-icon {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 1rem;
+  stroke: var(--color-primary);
+  stroke-width: 2;
+  fill: none;
+  transition: var(--transition-default);
+}
+.form-icon:hover {
+  transform: scale(1.1);
+}
+
+.form-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  margin-bottom: 1.5rem;
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
+  text-align: left;
 }
 
 label {
   display: block;
-  margin-bottom: 0.4rem;
-  color: #334155;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-dark);
   font-weight: 600;
 }
 
-input {
+.form-input {
   width: 100%;
-  padding: 0.6rem 0.8rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border 0.2s;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-primary-light);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: var(--transition-default);
 }
-
-input:focus {
-  border-color: #2563eb;
+.form-input:focus {
+  border-color: var(--color-primary);
   outline: none;
-  background-color: #f8fafc;
+  background: var(--color-bg-light);
 }
 
 .submit-button {
   width: 100%;
   padding: 0.75rem;
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: 0.5rem;
+  font-size: 1rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.submit-button:hover {
-  background: #1e40af;
+  transition: var(--transition-default);
 }
 
 .errors {
-  color: #dc2626;
   margin-top: 1rem;
   list-style: none;
-  padding-left: 0;
-  font-size: 14px;
+  color: var(--color-error);
+  font-size: 0.875rem;
+  text-align: left;
+  padding-left: 1rem;
 }
 
 .message {
   margin-top: 1rem;
-  color: #16a34a;
-  text-align: center;
+  color: var(--color-success);
   font-weight: 500;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
+    background-color: var(--color-bg-light);
   }
   to {
     opacity: 1;
   }
 }
-
 @keyframes slideUp {
   from {
     transform: translateY(20px);
@@ -161,6 +190,23 @@ input:focus {
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .form-card {
+    padding: 2rem 1.5rem;
+  }
+  .form-title {
+    font-size: 1.5rem;
+  }
+  .form-input {
+    font-size: 0.95rem;
+    padding: 0.6rem 0.8rem;
+  }
+  .submit-button {
+    font-size: 0.95rem;
   }
 }
 </style>
