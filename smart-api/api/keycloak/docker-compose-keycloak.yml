@@ -15,7 +15,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.3
     container_name: keycloak
-    command: start-dev --import-realm --log-level=DEBUG
+    command: start-dev --import-realm
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: postgres-keycloak
@@ -29,7 +29,7 @@ services:
       KC_LOG_CONSOLE_COLOR: true
       KC_LOG_CONSOLE_OUTPUT: default
     volumes:
-      - ./realms:/opt/keycloak/data/import
+      - ./realms/smart-hcs.json:/opt/keycloak/data/import/smart-hcs.json:ro
     ports:
       - 9080:8080
     depends_on:

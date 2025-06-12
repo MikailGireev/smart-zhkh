@@ -1,33 +1,25 @@
-/* Базовые цветовые переменные */
 :root {
-  /* Основные цвета */
   --color-primary: #2563eb;
   --color-primary-dark: #1d4ed8;
   --color-primary-light: #3b82f6;
 
-  /* Текст */
   --color-text-light: #ffffff;
   --color-text-dark: #1e293b;
 
-  /* Фоны */
   --color-bg-light: #f8fafc;
   --color-bg-dark: #0f172a;
 
-  /* Дополнительные */
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
 
-  /* Тени */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 
-  /* Переходы */
   --transition-default: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Темная тема */
 @media (prefers-color-scheme: dark) {
   :root {
     --color-text-dark: #e2e8f0;
@@ -36,7 +28,6 @@
   }
 }
 
-/* Глобальные сбросы и базовые стили */
 *,
 *::before,
 *::after {
@@ -74,7 +65,6 @@ button {
   font-family: inherit;
 }
 
-/* Общие utility-классы */
 .container {
   width: 100%;
   max-width: 1280px;
