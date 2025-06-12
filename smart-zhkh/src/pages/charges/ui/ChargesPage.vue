@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/shared/store/auth';
-import { fetchCharges } from '@/shared/api/charges';
+import { fetchCharges, updateCharge } from '@/shared/api/charges';
 
 const auth = useAuthStore();
 const charges = ref<any[]>([]);
@@ -17,7 +17,20 @@ onMounted(async () => {
   }
 });
 
-const filteredCharges = computed(() => charges.value);
+const unpaidCharges = computed(() => charges.value.filter((c) => !c.paid));
+const paidCharges = computed(() => charges.value.filter((c) => c.paid));
+
+async function payCharge(id: number) {
+  const charge = charges.value.find((c) => c.id === id);
+  if (!charge) return;
+
+  try {
+    await updateCharge({ ...charge, paid: true });
+    charge.paid = true;
+  } catch (e) {
+    console.error('Ошибка оплаты:', e);
+  }
+}
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString('ru-RU');
@@ -29,30 +42,39 @@ function formatDate(date: string) {
     <div class="charges-header">
       <h2 class="charges-title">Ваши начисления</h2>
       <RouterLink to="/charges/add" class="btn btn-primary add-button">
-        <svg viewBox="0 0 24 24" class="btn-icon" aria-hidden="true">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-        <span>Добавить</span>
+        <span>+ Добавить</span>
       </RouterLink>
     </div>
 
     <div v-if="isLoading" class="loading">⏳ Загрузка...</div>
 
-    <div v-else-if="filteredCharges.length === 0" class="empty-state">
-      <p>Пока нет начислений</p>
-    </div>
+    <div v-else>
+      <div v-if="unpaidCharges.length > 0">
+        <h3>Неоплаченные</h3>
+        <div class="card-grid">
+          <div v-for="charge in unpaidCharges" :key="charge.id" class="charge-card">
+            <h3 class="category">{{ charge.category }}</h3>
+            <p class="amount">💰 {{ charge.amount }} ₽</p>
+            <p class="date">📅 {{ formatDate(charge.date) }}</p>
+            <button @click="payCharge(charge.id)" class="pay-button">💳 Оплатить</button>
+          </div>
+        </div>
+      </div>
 
-    <div v-else class="card-grid">
-      <div v-for="charge in filteredCharges" :key="charge.id" class="charge-card">
-        <div class="card-topbar"></div>
-        <svg viewBox="0 0 24 24" class="charge-icon" aria-hidden="true">
-          <path d="M3 3h18v18H3z" />
-          <path d="M3 7h18" />
-        </svg>
-        <h3 class="category">{{ charge.category }}</h3>
-        <p class="amount">💰 {{ charge.amount.toLocaleString() }} ₽</p>
-        <p class="date">📅 {{ formatDate(charge.date) }}</p>
+      <div v-if="paidCharges.length > 0" style="margin-top: 2rem">
+        <h3>Оплаченные</h3>
+        <div class="card-grid">
+          <div v-for="charge in paidCharges" :key="charge.id" class="charge-card paid">
+            <h3 class="category">{{ charge.category }}</h3>
+            <p class="amount">💰 {{ charge.amount }} ₽</p>
+            <p class="date">📅 {{ formatDate(charge.date) }}</p>
+            <p class="status">✅ Оплачено</p>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="unpaidCharges.length === 0 && paidCharges.length === 0" class="empty-state">
+        <p>Начислений нет</p>
       </div>
     </div>
   </div>
@@ -81,7 +103,7 @@ function formatDate(date: string) {
   left: -40%;
   width: 180%;
   height: 180%;
-  background: radial-gradient(circle at center, rgba(37,99,235,0.1) 0%, transparent 70%);
+  background: radial-gradient(circle at center, rgba(37, 99, 235, 0.1) 0%, transparent 70%);
   animation: rotate 30s linear infinite;
   z-index: -1;
 }
@@ -150,8 +172,9 @@ function formatDate(date: string) {
     0 6px 16px -4px rgba(0, 0, 0, 0.1),
     inset 0 1px 3px rgba(255, 255, 255, 0.5);
   padding: 2rem 1.5rem 1.5rem;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 0.4s;
+  transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s;
   overflow: hidden;
   color: var(--color-text-dark);
   text-align: center;
@@ -165,13 +188,11 @@ function formatDate(date: string) {
 
 .card-topbar {
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 4px;
-  background: linear-gradient(
-    90deg,
-    var(--color-primary-light),
-    var(--color-primary-dark)
-  );
+  background: linear-gradient(90deg, var(--color-primary-light), var(--color-primary-dark));
 }
 
 .charge-icon {
@@ -181,7 +202,9 @@ function formatDate(date: string) {
   stroke: var(--color-primary);
   stroke-width: 2;
   fill: none;
-  transition: transform 0.3s, filter 0.3s;
+  transition:
+    transform 0.3s,
+    filter 0.3s;
   filter: drop-shadow(0 2px 4px rgba(37, 99, 235, 0.2));
 }
 .charge-card:hover .charge-icon {
@@ -208,13 +231,119 @@ function formatDate(date: string) {
   color: var(--color-text-dark);
 }
 
+.success-message {
+  margin-bottom: 1rem;
+  color: #16a34a;
+  font-weight: 500;
+}
+
+.pay-button {
+  background: #22c55e;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+.pay-button:hover {
+  background: #16a34a;
+}
+
+.confirm {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+}
+.cancel {
+  background: transparent;
+  color: #64748b;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+}
+
+.charges-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.04);
+}
+
+.charges-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.charge-card {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+.charge-card.paid {
+  background: #e0fce0;
+  border: 1px solid #22c55e;
+}
+
+.category {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.amount,
+.date {
+  margin: 0.25rem 0;
+}
+
+.status {
+  color: #16a34a;
+  font-weight: 500;
+}
+
+.pay-button {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.pay-button:hover {
+  background: #2563eb;
+}
+
 @keyframes cardEntrance {
-  from { opacity: 0; transform: translateY(30px) scale(0.95); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 @keyframes rotate {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive */
