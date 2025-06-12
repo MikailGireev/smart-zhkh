@@ -7,6 +7,11 @@ const auth = useAuthStore();
 const charges = ref<any[]>([]);
 const isLoading = ref(true);
 
+const showModal = ref(false);
+const selectedChargeId = ref<number | null>(null);
+const cardNumber = ref('');
+const cvv = ref('');
+
 onMounted(async () => {
   try {
     charges.value = await fetchCharges(auth.userId);
@@ -20,20 +25,31 @@ onMounted(async () => {
 const unpaidCharges = computed(() => charges.value.filter((c) => !c.paid));
 const paidCharges = computed(() => charges.value.filter((c) => c.paid));
 
-async function payCharge(id: number) {
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString('ru-RU');
+}
+
+function openPaymentModal(id: number) {
+  selectedChargeId.value = id;
+  cardNumber.value = '';
+  cvv.value = '';
+  showModal.value = true;
+}
+
+async function confirmPayment() {
+  const id = selectedChargeId.value;
+  if (!id || !cardNumber.value || !cvv.value) return;
+
   const charge = charges.value.find((c) => c.id === id);
   if (!charge) return;
 
   try {
     await updateCharge({ ...charge, paid: true });
     charge.paid = true;
+    showModal.value = false;
   } catch (e) {
     console.error('Ошибка оплаты:', e);
   }
-}
-
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString('ru-RU');
 }
 </script>
 
@@ -41,9 +57,7 @@ function formatDate(date: string) {
   <div class="charges-container container">
     <div class="charges-header">
       <h2 class="charges-title">Ваши начисления</h2>
-      <RouterLink to="/charges/add" class="btn btn-primary add-button">
-        <span>+ Добавить</span>
-      </RouterLink>
+      <RouterLink to="/charges/add" class="btn btn-primary add-button">+ Добавить</RouterLink>
     </div>
 
     <div v-if="isLoading" class="loading">⏳ Загрузка...</div>
@@ -56,7 +70,7 @@ function formatDate(date: string) {
             <h3 class="category">{{ charge.category }}</h3>
             <p class="amount">💰 {{ charge.amount }} ₽</p>
             <p class="date">📅 {{ formatDate(charge.date) }}</p>
-            <button @click="payCharge(charge.id)" class="pay-button">💳 Оплатить</button>
+            <button @click="openPaymentModal(charge.id)" class="pay-button">💳 Оплатить</button>
           </div>
         </div>
       </div>
@@ -78,6 +92,24 @@ function formatDate(date: string) {
       </div>
     </div>
   </div>
+
+  <!-- 💳 Модальное окно оплаты -->
+  <teleport to="body">
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Оплата начисления</h3>
+        <label>Номер карты</label>
+        <input v-model="cardNumber" type="text" placeholder="0000 0000 0000 0000" maxlength="19" />
+        <label>CVV</label>
+        <input v-model="cvv" type="text" placeholder="123" maxlength="3" />
+
+        <div class="modal-actions">
+          <button class="confirm" @click="confirmPayment">Подтвердить</button>
+          <button class="cancel" @click="showModal = false">Отмена</button>
+        </div>
+      </div>
+    </div>
+  </teleport>
 </template>
 
 <style scoped>
@@ -325,6 +357,57 @@ function formatDate(date: string) {
 }
 .pay-button:hover {
   background: #2563eb;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+.modal-content h3 {
+  margin-bottom: 1rem;
+}
+.modal-content input {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+}
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+}
+.confirm {
+  background: #2563eb;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.cancel {
+  background: transparent;
+  color: #64748b;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 @keyframes cardEntrance {
