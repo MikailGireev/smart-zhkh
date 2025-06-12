@@ -1,3 +1,33 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/shared/store/auth';
+import { createCharge } from '@/shared/api/charges';
+
+const router = useRouter();
+const auth = useAuthStore();
+
+const category = ref('');
+const amount = ref(0);
+const date = ref('');
+const message = ref('');
+
+async function submitForm() {
+  try {
+    await createCharge({
+      user_id: Number(auth.userId),
+      category: category.value,
+      amount: amount.value,
+      date: date.value,
+    });
+    message.value = '✅ Начисление добавлено!';
+    setTimeout(() => router.push('/charges'), 800);
+  } catch {
+    message.value = '❌ Ошибка при добавлении начисления';
+  }
+}
+</script>
+
 <template>
   <div class="add-charge-container container">
     <h2 class="add-charge-title">
@@ -39,82 +69,78 @@
         <input v-model="date" id="date" type="date" required class="form-input" />
       </div>
 
-      <button type="submit" class="btn submit-button">Добавить</button>
+      <button type="submit" class="submit-button">Добавить</button>
     </form>
 
     <p v-if="message" class="message">{{ message }}</p>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/shared/store/auth';
-import { createCharge } from '@/shared/api/charges';
-
-const router = useRouter();
-const auth = useAuthStore();
-
-const category = ref('');
-const amount = ref(0);
-const date = ref('');
-const message = ref('');
-
-async function submitForm() {
-  try {
-    await createCharge({
-      user_id: Number(auth.userId),
-      category: category.value,
-      amount: amount.value,
-      date: date.value,
-    });
-    message.value = '✅ Начисление добавлено!';
-    setTimeout(() => router.push('/charges'), 800);
-  } catch {
-    message.value = '❌ Ошибка при добавлении начисления';
-  }
-}
-</script>
-
 <style scoped>
 .add-charge-container {
+  position: relative;
+  overflow: hidden;
   margin: 3rem auto;
-  padding: 2.5rem 1.5rem;
-  /* Градиент на основе primary и bg-light */
-  background: linear-gradient(145deg, var(--color-primary-light) 0%, var(--color-bg-light) 100%);
-  border-radius: 1.5rem;
-  box-shadow: var(--shadow-lg);
-  animation: fadeIn 0.4s ease;
+  padding: 3rem 2rem;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 1.75rem;
+  box-shadow:
+    0 12px 30px -8px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.6);
+  animation: cardEntrance 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  color: var(--color-text-dark);
+}
+.add-charge-container::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+  background: radial-gradient(circle at center, rgba(37, 99, 235, 0.1) 0%, transparent 70%);
+  animation: rotate 30s linear infinite;
+  z-index: -1;
 }
 
-/* Заголовок */
 .add-charge-title {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 1.5rem;
-  color: var(--color-text-light);
-  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-primary-dark);
+  margin-bottom: 2rem;
+  position: relative;
+}
+.add-charge-title::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 50px;
+  height: 4px;
+  background: var(--color-primary-light);
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--color-primary-light);
 }
 
-/* Иконка */
 .add-icon {
   width: 1.75rem;
   height: 1.75rem;
-  stroke: var(--color-text-light);
+  stroke: var(--color-primary);
   stroke-width: 2;
   fill: none;
-  transition: var(--transition-default);
+  transition: transform 0.3s;
 }
 .add-icon:hover {
-  transform: scale(1.1);
+  transform: scale(1.2);
 }
 
-/* Форма */
 .add-charge-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+  display: grid;
+  gap: 1.5rem;
 }
 
 .form-group label {
@@ -127,73 +153,82 @@ async function submitForm() {
 .form-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--color-primary);
-  border-radius: 0.5rem;
+  border: 1px solid var(--color-primary-light);
+  border-radius: 0.75rem;
   font-size: 1rem;
   background: var(--color-text-light);
   transition: var(--transition-default);
 }
 .form-input:focus {
-  border-color: var(--color-primary-dark);
-  background: var(--color-bg-light);
+  border-color: var(--color-primary);
   outline: none;
+  background: var(--color-bg-light);
 }
 
-/* Кнопка */
 .submit-button {
-  align-self: flex-end;
+  justify-self: end;
   padding: 0.75rem 1.5rem;
-  background-color: var(--color-primary);
+  background: var(--color-primary);
   color: var(--color-text-light);
-  border-radius: 0.5rem;
-  font-weight: 600;
   border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
   transition: var(--transition-default);
 }
 .submit-button:hover {
-  background-color: var(--color-primary-dark);
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
 }
 
-/* Сообщение */
 .message {
   margin-top: 1.5rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-success);
   text-align: center;
 }
 
-/* Анимации */
-@keyframes fadeIn {
+@keyframes cardEntrance {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(30px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
-/* Адаптивность */
+/* Responsive */
 @media (max-width: 768px) {
   .add-charge-container {
-    padding: 2rem 1rem;
+    padding: 2.5rem 1.5rem;
   }
   .add-charge-title {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
   .submit-button {
     width: 100%;
   }
 }
-
 @media (max-width: 480px) {
   .form-input {
-    font-size: 0.95rem;
     padding: 0.6rem 0.8rem;
+    font-size: 0.95rem;
   }
   .add-charge-title {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
+  }
+  .submit-button {
+    font-size: 0.95rem;
   }
 }
 </style>

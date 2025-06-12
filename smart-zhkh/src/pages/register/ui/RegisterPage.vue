@@ -1,3 +1,45 @@
+<script setup lang="ts">
+// пока скрипт не используется, но оставлен по стандарту
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/shared/store/auth';
+import { registerUser } from '@/shared/api';
+
+const router = useRouter();
+const auth = useAuthStore();
+
+const username = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+const errors = ref<string[]>([]);
+const message = ref('');
+
+async function handleRegister() {
+  errors.value = [];
+  message.value = '';
+
+  if (!username.value.trim()) {
+    errors.value.push('Введите логин');
+  }
+  if (password.value.length < 6) {
+    errors.value.push('Пароль должен быть не менее 6 символов');
+  }
+  if (password.value !== confirmPassword.value) {
+    errors.value.push('Пароли не совпадают');
+  }
+  if (errors.value.length) return;
+
+  try {
+    await registerUser(username.value, password.value);
+    message.value = '✅ Регистрация прошла успешно';
+    auth.login(username.value, 'fake-token', auth.userId);
+    router.push('/dashboard');
+  } catch (err: any) {
+    message.value = err.message || 'Ошибка регистрации';
+  }
+}
+</script>
+
 <template>
   <div class="page-wrapper container">
     <div class="form-card">
@@ -42,7 +84,7 @@
           />
         </div>
 
-        <button type="submit" class="submit-button btn-primary">📝 Зарегистрироваться</button>
+        <button type="submit" class="submit-button">📝 Зарегистрироваться</button>
       </form>
 
       <ul v-if="errors.length" class="errors">
@@ -56,68 +98,45 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/shared/store/auth';
-import { registerUser } from '@/shared/api';
-
-const router = useRouter();
-const auth = useAuthStore();
-
-const username = ref('');
-const password = ref('');
-const confirmPassword = ref('');
-const errors = ref<string[]>([]);
-const message = ref('');
-
-async function handleRegister() {
-  errors.value = [];
-  message.value = '';
-
-  if (!username.value.trim()) {
-    errors.value.push('Введите логин');
-  }
-  if (password.value.length < 6) {
-    errors.value.push('Пароль должен быть не менее 6 символов');
-  }
-  if (password.value !== confirmPassword.value) {
-    errors.value.push('Пароли не совпадают');
-  }
-  if (errors.value.length) return;
-
-  try {
-    await registerUser(username.value, password.value);
-    message.value = '✅ Регистрация прошла успешно';
-    auth.login(username.value, 'fake-token', auth.userId);
-    router.push('/dashboard');
-  } catch (err: any) {
-    message.value = err.message || 'Ошибка регистрации';
-  }
-}
-</script>
-
 <style scoped>
 .page-wrapper {
+  position: relative;
+  overflow: hidden;
   min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 1rem;
-  /* Градиент из базовых цветов primary */
-  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(145deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.6) 100%);
+  animation: fadeInUp 0.8s ease-out;
+}
+.page-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: rotate 25s linear infinite;
+  z-index: 0;
 }
 
 .form-card {
-  background: var(--color-bg-light);
-  padding: 2.5rem 3rem;
-  border-radius: 1rem;
+  position: relative;
+  z-index: 10;
   width: 100%;
-  max-width: 400px;
-  box-shadow: var(--shadow-lg);
-  animation: slideUp 0.5s ease;
+  max-width: 420px;
+  padding: 3rem 2rem;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 1.5rem;
+  box-shadow:
+    0 12px 24px -6px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.6);
   text-align: center;
-  color: var(--color-text-dark);
+  animation: cardEntrance 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .form-icon {
@@ -130,24 +149,37 @@ async function handleRegister() {
   transition: var(--transition-default);
 }
 .form-icon:hover {
-  transform: scale(1.1);
+  transform: scale(1.2);
 }
 
 .form-title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--color-primary);
-  margin-bottom: 1.5rem;
+  color: var(--color-primary-dark);
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+.form-title::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 45px;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.5);
 }
 
 .form-group {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
   text-align: left;
 }
 
 label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
   color: var(--color-text-dark);
   font-weight: 600;
 }
@@ -155,29 +187,32 @@ label {
 .form-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--color-primary);
-  border-radius: 0.5rem;
+  border: 1px solid var(--color-primary-light);
+  border-radius: 0.75rem;
   font-size: 1rem;
+  background: var(--color-text-light);
   transition: var(--transition-default);
 }
 .form-input:focus {
-  border-color: var(--color-primary-dark);
-  background: var(--color-bg-light);
+  border-color: var(--color-primary);
   outline: none;
+  background: var(--color-bg-light);
 }
 
 .submit-button {
   width: 100%;
   padding: 0.75rem;
-  border-radius: 0.5rem;
+  background: var(--color-primary);
+  color: var(--color-text-light);
+  border: none;
+  border-radius: 0.75rem;
   font-size: 1rem;
   font-weight: 600;
   transition: var(--transition-default);
-  background-color: var(--color-primary);
-  color: var(--color-text-light);
 }
 .submit-button:hover {
-  background-color: var(--color-primary-dark);
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
 }
 
 .errors {
@@ -192,37 +227,55 @@ label {
 .message-success {
   margin-top: 1rem;
   color: var(--color-success);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .message-error {
   margin-top: 1rem;
   color: var(--color-error);
-  font-weight: 500;
+  font-weight: 600;
 }
 
-@keyframes slideUp {
+@keyframes cardEntrance {
   from {
-    transform: translateY(20px);
     opacity: 0;
+    transform: translateY(30px) scale(0.95);
   }
   to {
-    transform: translateY(0);
     opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
-/* Адаптивность */
+/* Responsive */
 @media (max-width: 480px) {
   .form-card {
-    padding: 2rem 1.5rem;
+    padding: 2.5rem 1.5rem;
   }
   .form-title {
     font-size: 1.5rem;
   }
   .form-input {
-    font-size: 0.95rem;
     padding: 0.6rem 0.8rem;
+    font-size: 0.95rem;
   }
   .submit-button {
     font-size: 0.95rem;

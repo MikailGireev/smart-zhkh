@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// пока скрипт не используется, но оставлен по стандарту
+// скрипт оставлен пустым — здесь можно добавить логику позже
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/shared/store/auth';
@@ -82,25 +82,44 @@ async function handleLogin() {
 
 <style scoped>
 .page-wrapper {
+  position: relative;
+  overflow: hidden;
   min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 1rem;
-  background: linear-gradient(145deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
-  color: var(--color-text-light);
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(145deg, rgba(37, 99, 235, 0.95) 0%, rgba(29, 78, 216, 0.95) 100%);
+  animation: fadeInUp 0.8s ease;
+}
+.page-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
+  z-index: 0;
 }
 
 .form-card {
-  background: var(--color-bg-light);
-  padding: 2.5rem 3rem;
-  border-radius: 1rem;
+  position: relative;
+  z-index: 10;
   width: 100%;
   max-width: 400px;
-  box-shadow: var(--shadow-lg);
-  animation: slideUp 0.5s ease;
+  padding: 3rem 2rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 10px 20px -5px rgba(0, 0, 0, 0.2),
+    0 6px 10px -4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 2px rgba(255, 255, 255, 0.5);
   text-align: center;
-  position: relative;
+  animation: cardEntrance 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .form-icon {
@@ -118,19 +137,32 @@ async function handleLogin() {
 
 .form-title {
   font-size: 1.75rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--color-primary-dark);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+.form-title::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 3px;
+  background: var(--color-primary-light);
+  border-radius: 3px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
 }
 
 .form-group {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
   text-align: left;
 }
 
 label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
   color: var(--color-text-dark);
   font-weight: 600;
 }
@@ -139,13 +171,13 @@ label {
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid var(--color-primary-light);
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   font-size: 1rem;
   background: var(--color-text-light);
   transition: var(--transition-default);
 }
 .form-input:focus {
-  border-color: var(--color-primary-dark);
+  border-color: var(--color-primary);
   outline: none;
   background: var(--color-bg-light);
 }
@@ -153,16 +185,17 @@ label {
 .submit-button {
   width: 100%;
   padding: 0.75rem;
-  background-color: var(--color-primary);
+  background: var(--color-primary);
   color: var(--color-text-light);
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   font-size: 1rem;
   font-weight: 600;
   transition: var(--transition-default);
 }
 .submit-button:hover {
-  background-color: var(--color-primary-dark);
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
 }
 
 .errors {
@@ -177,31 +210,49 @@ label {
 .message {
   margin-top: 1rem;
   color: var(--color-success);
-  font-weight: 500;
+  font-weight: 600;
 }
 
-@keyframes slideUp {
+@keyframes cardEntrance {
   from {
-    transform: translateY(20px);
     opacity: 0;
+    transform: translateY(20px) scale(0.95);
   }
   to {
-    transform: translateY(0);
     opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
-/* Адаптивность */
+/* Responsive */
 @media (max-width: 480px) {
   .form-card {
-    padding: 2rem 1.5rem;
+    padding: 2.5rem 1.5rem;
   }
   .form-title {
     font-size: 1.5rem;
   }
   .form-input {
-    font-size: 0.95rem;
     padding: 0.6rem 0.8rem;
+    font-size: 0.95rem;
   }
   .submit-button {
     font-size: 0.95rem;
