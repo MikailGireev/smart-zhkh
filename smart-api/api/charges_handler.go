@@ -42,7 +42,6 @@ func ChargesHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(userCharges)
 }
 
-
 func CreateChargeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -120,4 +119,31 @@ func GetCharge(id int) (auth.Charge, error) {
 		}
 	}
 	return auth.Charge{}, fmt.Errorf("charge not found: %w", auth.ErrNotFound)
+}
+
+func ChargesHandlerPut(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPut {
+		httpx.NewJSONError(w, http.StatusMethodNotAllowed, "Method not allowed", "Only PUT allowed")
+		return
+	}
+
+	charges, err := auth.LoadCharges()
+	if err != nil {
+		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid request", "Not foun charges")
+		return
+	}
+
+	var charge auth.Charge
+	if err := json.NewDecoder(r.Body).Decode(&charge); err != nil {
+		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid request", "Invalid request")
+		return
+	}
+
+	for _, c := range charges {
+		if c.ID == charge.ID && c.UserId == charge.UserId {
+			c.Paid = true
+			fmt.Println(auth.Payding(c))
+		}
+	}
+	auth.SaveCharges(charges)
 }

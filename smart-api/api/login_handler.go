@@ -39,7 +39,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	err = auth.RegisterUser(claims.Sub, claims.PreferredUsername, " ")
 	if err != nil{
 		http.Error(w, "ошибка при добавлении персоны", http.StatusUnauthorized)
-		fmt.Println("jj")
 	}
 
 	w.Header().Set("Content-Type", "application/json")

@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -68,6 +69,19 @@ func (c *Charge) Validate() error {
 	}
 	if strings.TrimSpace(c.Date) == "" {
 		return fmt.Errorf("invalid date: %w", ErrValidation)
+	}
+	return nil
+}
+
+func Payding(ch Charge) error {
+	jsonData, err := json.Marshal(ch)
+	if err != nil{
+		return err
+	}
+
+	_, err = http.Post("https://localhost:8001/generate-receipt", "application/json", bytes.NewBuffer(jsonData))
+	if err != nil{
+		return err
 	}
 	return nil
 }

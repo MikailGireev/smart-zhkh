@@ -15,7 +15,7 @@ const message = ref('');
 async function submitForm() {
   try {
     await createCharge({
-      user_id: Number(auth.userId),
+      user_id: auth.userId,
       category: category.value,
       amount: amount.value,
       date: date.value,

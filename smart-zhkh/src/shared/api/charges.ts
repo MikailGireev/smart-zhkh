@@ -1,5 +1,5 @@
 export async function createCharge(charge: {
-  user_id: number;
+  user_id: string;
   category: string;
   amount: number;
   date: string;
