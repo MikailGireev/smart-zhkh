@@ -90,21 +90,37 @@ async function onSubmit() {
         />
       </div>
 
-      <button type="submit" class="btn btn-primary submit-button">Сохранить</button>
+      <button type="submit" class="submit-button">Сохранить</button>
     </form>
   </div>
 </template>
 
 <style scoped>
 .add-account-container {
+  position: relative;
+  overflow: hidden;
   margin: 3rem auto;
-  padding: 2.5rem 1.5rem;
-  /* Градиентный фон с primary-цветами */
-  background: linear-gradient(145deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
-  color: var(--color-text-light);
-  border-radius: 1.5rem;
-  box-shadow: var(--shadow-lg);
-  animation: fadeIn 0.4s ease;
+  padding: 3rem 2rem;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 1.75rem;
+  box-shadow:
+    0 12px 30px -8px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.6);
+  animation: cardEntrance 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  color: var(--color-text-dark);
+}
+.add-account-container::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+  background: radial-gradient(circle at center, rgba(37, 99, 235, 0.1) 0%, transparent 70%);
+  animation: rotate 30s linear infinite;
+  z-index: -1;
 }
 
 .form-title {
@@ -112,15 +128,30 @@ async function onSubmit() {
   align-items: center;
   gap: 0.75rem;
   font-size: 1.75rem;
-  color: var(--color-text-light);
-  margin-bottom: 1.5rem;
+  font-weight: 800;
+  color: var(--color-primary-dark);
+  margin-bottom: 2rem;
+  position: relative;
+}
+.form-title::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 50px;
+  height: 4px;
+  background: var(--color-primary-light);
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--color-primary-light);
 }
 
 .form-icon {
   width: 2rem;
   height: 2rem;
-  fill: var(--color-text-light);
-  transition: var(--transition-default);
+  stroke: var(--color-primary);
+  stroke-width: 2;
+  fill: none;
+  transition: transform 0.3s;
 }
 .form-icon:hover {
   transform: scale(1.1);
@@ -128,79 +159,87 @@ async function onSubmit() {
 
 .account-form {
   display: grid;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .form-group label {
+  display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: var(--color-text-light);
+  color: var(--color-text-dark);
 }
 
 .form-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 0.5rem;
+  border: 1px solid var(--color-primary-light);
+  border-radius: 0.75rem;
   font-size: 1rem;
-  background: rgba(255, 255, 255, 0.2);
-  color: var(--color-text-light);
+  background: var(--color-text-light);
   transition: var(--transition-default);
 }
-.form-input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
-}
 .form-input:focus {
-  border-color: var(--color-text-light);
-  background: rgba(255, 255, 255, 0.3);
+  border-color: var(--color-primary);
   outline: none;
+  background: var(--color-bg-light);
 }
 
 .submit-button {
   justify-self: end;
   padding: 0.75rem 1.5rem;
-}
-
-.btn-primary {
-  background-color: var(--color-text-light);
-  color: var(--color-primary-dark);
+  background: var(--color-primary);
+  color: var(--color-text-light);
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
   transition: var(--transition-default);
 }
-.btn-primary:hover {
-  background-color: var(--color-bg-light);
+.submit-button:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
 }
 
-@keyframes fadeIn {
+@keyframes cardEntrance {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(30px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
-/* Адаптивность */
 @media (max-width: 768px) {
   .add-account-container {
-    padding: 2rem 1rem;
+    padding: 2.5rem 1.5rem;
   }
   .form-title {
     font-size: 1.5rem;
   }
   .submit-button {
-    justify-self: stretch;
+    width: 100%;
   }
 }
-
 @media (max-width: 480px) {
   .form-input {
-    font-size: 0.95rem;
     padding: 0.6rem 0.8rem;
+    font-size: 0.95rem;
   }
   .form-title {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
+  }
+  .submit-button {
+    font-size: 0.95rem;
   }
 }
 </style>
