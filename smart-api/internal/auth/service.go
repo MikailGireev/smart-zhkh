@@ -36,20 +36,20 @@ func SaveUsers(users []User) error {
 	return json.NewEncoder(file).Encode(users)
 }
 
-func RegisterUser(username, password string) error {
+func RegisterUser(user_id, username, password string) error {
 	users, err := LoadUser()
+
 	if err != nil {
 		return err
 	}
-
 	for _, user := range users {
 		if user.Username == username {
-			return errors.New("user already exists")
+			return nil
 		}
 	}
 
 	newUser := User{
-		ID:       len(users) + 1,
+		ID:       user_id,
 		Username: username,
 		Password: password,
 	}
@@ -79,15 +79,19 @@ func LoginUser(username, password string) (*User, error) {
 
 func (u *User) Validate() error {
 	if len(u.Username) < 2 {
+	fmt.Println(2)
 		return fmt.Errorf("username must be at least 2 characters: %w", ErrValidation)
 	}
-	if  len(u.Password) < 6 {
-		return fmt.Errorf("password must be at least 6 characters: %w", ErrValidation)
-	}
+	// if  len(u.Password) < 4 {
+	// fmt.Println(3)
+	// 	return fmt.Errorf("password must be at least 6 characters: %w", ErrValidation)
+	// }
 	if u.Username == "" {
+	fmt.Println(4)
 		return fmt.Errorf("invalid username: %w", ErrValidation)
 	}
 	if u.Password == "" {
+	fmt.Println(5)
 		return fmt.Errorf("invalid password: %w", ErrValidation)
 	}
 	return nil

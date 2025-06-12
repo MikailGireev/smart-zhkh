@@ -1,32 +1,3 @@
-<template>
-  <div class="profile-container">
-    <h2>👤 Профиль</h2>
-
-    <div class="user-info">
-      <p><strong>Пользователь:</strong> {{ auth.username }}</p>
-    </div>
-
-    <h3>Ваши счета</h3>
-
-    <div v-if="isLoading" class="loading">Загрузка...</div>
-
-    <div v-else-if="filteredAccounts.length === 0" class="empty-state">
-      <p>У вас пока нет заполненного профиля.</p>
-      <RouterLink to="/accounts/add" class="add-profile-button">📝 Заполнить профиль</RouterLink>
-    </div>
-
-    <div v-else class="account-list">
-      <div v-for="acc in filteredAccounts" :key="acc.id" class="account-card">
-        <p><strong>Номер счёта:</strong> {{ acc.account_num }}</p>
-        <p><strong>ФИО:</strong> {{ acc.full_name }}</p>
-        <p><strong>Адрес:</strong> {{ acc.address }}</p>
-        <p><strong>Площадь:</strong> {{ acc.area }} м²</p>
-        <RouterLink :to="`/accounts/${acc.id}/edit`" class="edit-link">✏️ Редактировать</RouterLink>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/shared/store/auth';
@@ -38,8 +9,7 @@ const isLoading = ref(true);
 
 onMounted(async () => {
   try {
-    const data = await fetchAccounts();
-    accounts.value = data;
+    accounts.value = await fetchAccounts();
   } catch (e) {
     console.error('Ошибка загрузки счетов:', e);
   } finally {
@@ -48,114 +18,199 @@ onMounted(async () => {
 });
 
 const filteredAccounts = computed(() =>
-  accounts.value.filter((acc) => Number(acc.user_id) === Number(auth.userId)),
+  accounts.value.filter((acc) => String(acc.user_id) === String(auth.userId)),
 );
 </script>
 
+<template>
+  <div class="profile-container container">
+    <h2 class="profile-title">
+      <svg viewBox="0 0 24 24" class="profile-icon" aria-hidden="true">
+        <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4 0-7 3-7 5v3h14v-3c0-2-3-5-7-5z" />
+      </svg>
+      Профиль
+    </h2>
+
+    <div class="user-info">
+      <p><strong>Пользователь:</strong> {{ auth.username }}</p>
+    </div>
+
+    <h3 class="section-title">Ваши счета</h3>
+
+    <div v-if="isLoading" class="loading">Загрузка...</div>
+
+    <div v-else-if="filteredAccounts.length === 0" class="empty-state">
+      <p>У вас пока нет заполненного профиля.</p>
+      <RouterLink to="/accounts/add" class="btn btn-primary mt-4">
+        📝 Заполнить профиль
+      </RouterLink>
+    </div>
+
+    <div v-else class="account-list">
+      <div v-for="acc in filteredAccounts" :key="acc.id" class="account-card">
+        <svg viewBox="0 0 24 24" class="card-icon" aria-hidden="true">
+          <path d="M3 6h18v12H3z" />
+          <path d="M3 10h18" />
+        </svg>
+        <p><strong>Номер счёта:</strong> {{ acc.account_num }}</p>
+        <p><strong>ФИО:</strong> {{ acc.full_name }}</p>
+        <p><strong>Адрес:</strong> {{ acc.address }}</p>
+        <p><strong>Площадь:</strong> {{ acc.area }} м²</p>
+      </div>
+    </div>
+  </div>
+</template>
+
 <style scoped>
 .profile-container {
-  max-width: 800px;
-  margin: 3rem auto;
-  padding: 2.5rem;
-  background: linear-gradient(to bottom right, #f9fafb, #e0f2fe);
-  border-radius: 16px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
-  animation: fadeIn 0.4s ease;
+  margin: 2rem auto;
+  padding: 2.5rem 1.5rem;
+  background: var(--color-bg-light);
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn 0.5s ease;
 }
 
-h2 {
-  font-size: 28px;
-  color: #0f172a;
-  margin-bottom: 1.5rem;
-}
-
-h3 {
-  font-size: 22px;
+.profile-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.75rem;
+  color: var(--color-primary-dark);
   margin-bottom: 1rem;
-  color: #1e293b;
+}
+
+.profile-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  fill: var(--color-primary);
+  transition: var(--transition-default);
+}
+.profile-icon:hover {
+  transform: scale(1.1);
 }
 
 .user-info {
-  margin-bottom: 2rem;
-  background: #f1f5f9;
+  background: var(--color-bg-dark);
+  color: var(--color-text-light);
   padding: 1rem;
-  border-radius: 8px;
-  color: #334155;
-  border-left: 5px solid #2563eb;
+  border-radius: 0.75rem;
+  border-left: 4px solid var(--color-primary);
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  color: var(--color-text-dark);
+  margin-bottom: 1rem;
 }
 
 .loading {
   text-align: center;
+  color: var(--color-text-dark);
   font-weight: 500;
-  color: #64748b;
 }
 
 .empty-state {
   text-align: center;
   padding: 2rem;
-  background: #fff1f2;
-  border: 1px dashed #fca5a5;
-  border-radius: 12px;
-  color: #b91c1c;
-}
-
-.add-profile-button {
-  display: inline-block;
-  margin-top: 1rem;
-  padding: 0.6rem 1.2rem;
-  background: #10b981;
-  color: white;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: background 0.3s;
-}
-
-.add-profile-button:hover {
-  background: #059669;
+  background: var(--color-bg-light);
+  border: 2px dashed var(--color-warning);
+  border-radius: 1rem;
+  color: var(--color-warning);
 }
 
 .account-list {
   display: grid;
-  grid-template-columns: 1fr;
   gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .account-card {
-  background: #f8fafc;
+  background: var(--color-text-light);
   padding: 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
-  border: 1px solid #e2e8f0;
-  transition: transform 0.2s;
+  border-radius: 1rem;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-default);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
-
 .account-card:hover {
   transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
-.edit-link {
-  display: inline-block;
-  margin-top: 0.75rem;
-  color: #3b82f6;
+.card-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-bottom: 0.75rem;
+  stroke: var(--color-primary);
+  stroke-width: 2;
+  fill: none;
+  transition: var(--transition-default);
+}
+.account-card:hover .card-icon {
+  transform: scale(1.1);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
   font-weight: 500;
-  font-size: 0.95rem;
-  transition: color 0.3s;
 }
 
-.edit-link:hover {
-  color: #1d4ed8;
-  text-decoration: underline;
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+  transition: var(--transition-default);
+}
+.btn-primary:hover {
+  background-color: var(--color-primary-dark);
 }
 
+.mt-4 {
+  margin-top: 1rem;
+}
+
+/* Анимации */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(15px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 2rem 1rem;
+  }
+  .profile-title {
+    font-size: 1.5rem;
+  }
+  .account-list {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-title {
+    font-size: 1.25rem;
+  }
+  .profile-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+  .account-card {
+    padding: 1rem;
   }
 }
 </style>

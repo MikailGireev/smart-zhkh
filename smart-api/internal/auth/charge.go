@@ -57,7 +57,7 @@ func CreateCharge(newCharge Charge) error {
 }
 
 func (c *Charge) Validate() error {
-	if c.UserId <= 0 {
+	if len(c.UserId) <= 0 {
 		return fmt.Errorf("invalid user id: %w", ErrValidation)
 	}
 	if c.Amount <= 0 {

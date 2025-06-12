@@ -19,7 +19,7 @@ export async function createCharge(charge: {
   return await res.json();
 }
 
-export async function fetchCharges(userId: number) {
+export async function fetchCharges(userId: string) {
   const res = await fetch(`http://localhost:8080/api/charges?user_id=${userId}`, {
     method: 'GET',
     headers: {

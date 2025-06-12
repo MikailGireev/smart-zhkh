@@ -7,7 +7,7 @@ import (
 
 type Account struct {
 	ID         int `json:"id"`
-	UserID     int `json:"user_id"`
+	UserID     string `json:"user_id"`
 	AccountNumber string `json:"account_number"`
 	FullName   string `json:"full_name"`
 	Address    string `json:"address"`

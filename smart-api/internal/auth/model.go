@@ -6,15 +6,15 @@ type LoginRequest struct {
 }
 
 type User struct {
-	ID       int
+	ID       string
 	Username string
 	Password string
 }
 
 type Charge struct {
-	ID       int    `json:"id"`
-	UserId   int    `json:"user_id"`
-	Amount   int    `json:"amount"`
-	Date     string `json:"date"`
-	Category string `json:"category"`
+	ID       int      `json:"id"`
+	UserId   string   `json:"user_id"`
+	Amount   int      `json:"amount"`
+	Date     string   `json:"date"`
+	Category string   `json:"category"`
 }
