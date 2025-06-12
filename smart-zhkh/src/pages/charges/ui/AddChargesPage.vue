@@ -41,14 +41,14 @@ async function submitForm() {
     <form @submit.prevent="submitForm" class="add-charge-form">
       <div class="form-group">
         <label for="category">📂 Категория</label>
-        <input
-          v-model="category"
-          id="category"
-          type="text"
-          required
-          placeholder="Например: Вода"
-          class="form-input"
-        />
+        <select v-model="category" id="category" required class="form-input">
+          <option disabled value="">Выберите категорию</option>
+          <option>Вода</option>
+          <option>Электричество</option>
+          <option>Газ</option>
+          <option>Интернет</option>
+          <option>Обслуживание дома</option>
+        </select>
       </div>
 
       <div class="form-group">
