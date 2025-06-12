@@ -1,1 +1,9 @@
-[{"id":1,"user_id":"fc07f38e-5d3e-463f-a49f-241e03443551","amount":1000,"date":"1111-11-11","category":"djlf"},{"id":2,"user_id":"f3af15a0-9ee1-4409-aa82-82e6eebe97cf","amount":122,"date":"2222-02-22","category":"sfg"},{"id":3,"user_id":"f3af15a0-9ee1-4409-aa82-82e6eebe97cf","amount":124,"date":"1111-11-11","category":"sdg"}]
+[
+    {
+        "id": 1,
+        "user_id": "",
+        "amount": 10000,
+        "date": "2025-06-21",
+        "category": "djlf"
+    }
+]
