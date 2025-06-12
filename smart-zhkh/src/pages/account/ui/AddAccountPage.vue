@@ -99,7 +99,9 @@ async function onSubmit() {
 .add-account-container {
   margin: 3rem auto;
   padding: 2.5rem 1.5rem;
-  background: var(--color-bg-light);
+  /* Градиентный фон с primary-цветами */
+  background: linear-gradient(145deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+  color: var(--color-text-light);
   border-radius: 1.5rem;
   box-shadow: var(--shadow-lg);
   animation: fadeIn 0.4s ease;
@@ -110,14 +112,14 @@ async function onSubmit() {
   align-items: center;
   gap: 0.75rem;
   font-size: 1.75rem;
-  color: var(--color-primary-dark);
+  color: var(--color-text-light);
   margin-bottom: 1.5rem;
 }
 
 .form-icon {
   width: 2rem;
   height: 2rem;
-  fill: var(--color-primary);
+  fill: var(--color-text-light);
   transition: var(--transition-default);
 }
 .form-icon:hover {
@@ -129,28 +131,28 @@ async function onSubmit() {
   gap: 1.25rem;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
 .form-group label {
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: var(--color-text-dark);
+  color: var(--color-text-light);
 }
 
 .form-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--color-primary-light);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 0.5rem;
   font-size: 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-text-light);
   transition: var(--transition-default);
 }
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
 .form-input:focus {
-  border-color: var(--color-primary);
-  background: var(--color-bg-light);
+  border-color: var(--color-text-light);
+  background: rgba(255, 255, 255, 0.3);
   outline: none;
 }
 
@@ -160,12 +162,12 @@ async function onSubmit() {
 }
 
 .btn-primary {
-  background-color: var(--color-primary);
-  color: var(--color-text-light);
+  background-color: var(--color-text-light);
+  color: var(--color-primary-dark);
   transition: var(--transition-default);
 }
 .btn-primary:hover {
-  background-color: var(--color-primary-dark);
+  background-color: var(--color-bg-light);
 }
 
 @keyframes fadeIn {
@@ -198,7 +200,7 @@ async function onSubmit() {
     padding: 0.6rem 0.8rem;
   }
   .form-title {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
 }
 </style>

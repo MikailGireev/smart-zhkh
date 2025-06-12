@@ -47,62 +47,56 @@ onMounted(() => {
 
 <style scoped>
 .dashboard-container {
+  /* яркий синий фон из переменных */
+  background: linear-gradient(145deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+  color: var(--color-text-light);
   max-width: 960px;
   margin: 2rem auto;
   padding: 2.5rem 1.5rem;
-  background: var(--color-bg-light);
-  background: linear-gradient(145deg, var(--color-bg-light) 0%, #ffffff 100%);
   border-radius: 1.5rem;
   box-shadow: var(--shadow-lg);
   animation: fadeIn 0.6s ease;
 }
 
-/* Заголовки */
+/* Заголовки над контейнером */
 .dashboard-title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--color-primary-dark);
   margin-bottom: 0.5rem;
 }
 
 .dashboard-subtitle {
   font-size: 1rem;
-  color: var(--color-text-dark);
   margin-bottom: 2rem;
+  opacity: 0.9;
 }
 
-/* Карточки */
+/* Сетка карточек */
 .card-grid {
   display: grid;
   gap: 1.5rem;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
+/* Основные карточки */
 .info-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 1.75rem;
-  background: var(--color-bg-light);
+  background: var(--color-text-light);
   border-radius: 1rem;
   box-shadow: var(--shadow-md);
-  text-align: center;
-  font-size: 1.125rem;
-  font-weight: 600;
   color: var(--color-text-dark);
-  transition: var(--transition-default);
   text-decoration: none;
+  transition: var(--transition-default);
   border: 2px solid transparent;
 }
-
 .info-card:hover {
   transform: translateY(-4px);
-  background: var(--color-bg-light);
   border-color: var(--color-primary-light);
   box-shadow: var(--shadow-lg);
-  color: var(--color-primary-dark);
 }
-
 .info-card.disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -111,10 +105,9 @@ onMounted(() => {
   transform: none;
   border-color: transparent;
   box-shadow: var(--shadow-md);
-  color: var(--color-text-dark);
 }
 
-/* Иконки в карточках */
+/* Иконки */
 .card-icon {
   width: 2.5rem;
   height: 2.5rem;
@@ -126,7 +119,7 @@ onMounted(() => {
   transform: scale(1.1);
 }
 
-/* Анимации */
+/* Анимация появления */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -151,17 +144,12 @@ onMounted(() => {
     font-size: 0.95rem;
   }
 }
-
 @media (max-width: 480px) {
-  .dashboard-container {
-    padding: 1.5rem 1rem;
-  }
   .card-grid {
     gap: 1rem;
   }
   .info-card {
     padding: 1.25rem;
-    font-size: 1rem;
   }
   .card-icon {
     width: 2rem;

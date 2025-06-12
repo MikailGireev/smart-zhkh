@@ -65,9 +65,10 @@ const filteredAccounts = computed(() =>
 .profile-container {
   margin: 2rem auto;
   padding: 2.5rem 1.5rem;
-  background: var(--color-bg-light);
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-bg-light) 100%);
   border-radius: 1.5rem;
   box-shadow: var(--shadow-lg);
+  color: var(--color-text-dark);
   animation: fadeIn 0.5s ease;
 }
 
@@ -76,6 +77,7 @@ const filteredAccounts = computed(() =>
   align-items: center;
   gap: 0.75rem;
   font-size: 1.75rem;
+  font-weight: 700;
   color: var(--color-primary-dark);
   margin-bottom: 1rem;
 }
@@ -91,16 +93,17 @@ const filteredAccounts = computed(() =>
 }
 
 .user-info {
-  background: var(--color-bg-dark);
-  color: var(--color-text-light);
+  background: var(--color-text-light);
   padding: 1rem;
   border-radius: 0.75rem;
   border-left: 4px solid var(--color-primary);
+  color: var(--color-text-dark);
   margin-bottom: 2rem;
 }
 
 .section-title {
   font-size: 1.25rem;
+  font-weight: 600;
   color: var(--color-text-dark);
   margin-bottom: 1rem;
 }
@@ -144,10 +147,10 @@ const filteredAccounts = computed(() =>
 .card-icon {
   width: 1.75rem;
   height: 1.75rem;
-  margin-bottom: 0.75rem;
   stroke: var(--color-primary);
   stroke-width: 2;
   fill: none;
+  margin-bottom: 0.75rem;
   transition: var(--transition-default);
 }
 .account-card:hover .card-icon {
@@ -176,7 +179,6 @@ const filteredAccounts = computed(() =>
   margin-top: 1rem;
 }
 
-/* Анимации */
 @keyframes fadeIn {
   from {
     opacity: 0;
