@@ -1,13 +1,19 @@
-export async function registerUser(username: string, password: string) {
+export async function registerUser(
+  username: string,
+  password: string,
+  email: string,
+  first_name: string,
+  last_name: string,
+) {
   const res = await fetch('http://localhost:8080/api/register', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       username,
       password,
-      email: username + '@example.com',
+      email,
+      first_name,
+      last_name,
     }),
   });
 

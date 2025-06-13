@@ -16,6 +16,9 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
+		Email    string `json:"email"`
+		FirstName string `json:"first_name"`
+		LastName string `json:"last_name"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -28,7 +31,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := auth.CreateKeycloakUser(req.Username, req.Password); err != nil {
+	if err := auth.CreateKeycloakUser(req.Username, req.Password, req.Email, req.FirstName, req.LastName); err != nil {
 		http.Error(w, "Failed to register user: "+err.Error(), http.StatusInternalServerError)
 		return
 	}

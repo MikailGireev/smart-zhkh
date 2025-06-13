@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// пока скрипт не используется, но оставлен по стандарту
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/shared/store/auth';
@@ -11,6 +10,9 @@ const auth = useAuthStore();
 const username = ref('');
 const password = ref('');
 const confirmPassword = ref('');
+const email = ref('');
+const firstName = ref('');
+const lastName = ref('');
 const errors = ref<string[]>([]);
 const message = ref('');
 
@@ -18,19 +20,22 @@ async function handleRegister() {
   errors.value = [];
   message.value = '';
 
-  if (!username.value.trim()) {
-    errors.value.push('Введите логин');
-  }
-  if (password.value.length < 6) {
-    errors.value.push('Пароль должен быть не менее 6 символов');
-  }
-  if (password.value !== confirmPassword.value) {
-    errors.value.push('Пароли не совпадают');
-  }
+  if (!username.value.trim()) errors.value.push('Введите логин');
+  if (!email.value.trim()) errors.value.push('Введите email');
+  if (!firstName.value.trim()) errors.value.push('Введите имя');
+  if (!lastName.value.trim()) errors.value.push('Введите фамилию');
+  if (password.value.length < 6) errors.value.push('Пароль должен быть не менее 6 символов');
+  if (password.value !== confirmPassword.value) errors.value.push('Пароли не совпадают');
   if (errors.value.length) return;
 
   try {
-    await registerUser(username.value, password.value);
+    await registerUser(
+      username.value,
+      password.value,
+      email.value,
+      firstName.value,
+      lastName.value,
+    );
     message.value = '✅ Регистрация прошла успешно';
     auth.login(username.value, 'fake-token', auth.userId);
     router.push('/dashboard');
@@ -43,7 +48,6 @@ async function handleRegister() {
 <template>
   <div class="page-wrapper container">
     <div class="form-card">
-      <!-- Иконка регистрации -->
       <svg viewBox="0 0 24 24" class="form-icon" aria-hidden="true">
         <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4 0-7 3-7 5v3h14v-3c0-2-3-5-7-5z" />
       </svg>
@@ -58,6 +62,39 @@ async function handleRegister() {
             type="text"
             v-model="username"
             placeholder="Введите логин"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            v-model="email"
+            placeholder="Введите email"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="firstName">Имя</label>
+          <input
+            id="firstName"
+            type="text"
+            v-model="firstName"
+            placeholder="Введите имя"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Фамилия</label>
+          <input
+            id="lastName"
+            type="text"
+            v-model="lastName"
+            placeholder="Введите фамилию"
             class="form-input"
           />
         </div>

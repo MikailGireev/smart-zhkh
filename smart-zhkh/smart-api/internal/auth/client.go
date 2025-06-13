@@ -50,16 +50,20 @@ func getAdminToken() (string, error) {
 }
 
 // CreateKeycloakUser — создаёт нового пользователя через Admin API
-func CreateKeycloakUser(username, password string) error {
+func CreateKeycloakUser(username, password, email, first_name, last_name string) error {
 	token, err := getAdminToken()
 	if err != nil {
 		return fmt.Errorf("cannot get admin token: %w", err)
 	}
 
 	userData := map[string]interface{}{
-		"username": username,
-		"enabled":  true,
-	}
+	"username":       username,
+	"email":          email,
+	"firstName":      first_name,
+	"lastName":       last_name,
+	"enabled":        true,
+	"emailVerified":  true,
+}
 
 	// 1. Создаем пользователя
 	body, _ := json.Marshal(userData)
