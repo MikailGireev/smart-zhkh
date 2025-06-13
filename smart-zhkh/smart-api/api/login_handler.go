@@ -39,6 +39,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to extract token claims: "+err.Error(), http.StatusUnauthorized)
 		return
 	}
+<<<<<<< HEAD:smart-zhkh/smart-api/api/login_handler.go
+=======
+	
+	err = auth.RegisterUser(claims.Sub, claims.PreferredUsername, " ")
+	if err != nil{
+		http.Error(w, "ошибка при добавлении персоны", http.StatusUnauthorized)
+	}
+>>>>>>> 46748f6b97a3be5c70c261d8560b8ca2c3646174:smart-api/api/login_handler.go
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
