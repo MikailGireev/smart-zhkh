@@ -44,6 +44,13 @@
             </svg>
             <span class="nav-text" title="Начисления">Начисления</span>
           </RouterLink>
+          <RouterLink to="/tasks/create" class="nav-item" active-class="router-link-active">
+            <svg viewBox="0 0 24 24" class="nav-icon">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span class="nav-text" title="Заявки">Заявки</span>
+          </RouterLink>
+
           <RouterLink to="/settings" class="nav-item" active-class="router-link-active">
             <svg viewBox="0 0 24 24" class="nav-icon">
               <circle cx="12" cy="12" r="3" />

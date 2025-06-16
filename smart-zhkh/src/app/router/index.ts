@@ -7,6 +7,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { Charges, ChargesAdd } from '@/pages/charges';
 import { Profile, ProfileEdit } from '@/pages/profile';
 import { AddAccount } from '@/pages/account';
+import { CreateTasks } from '@/pages/tasks/intex';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,6 +58,10 @@ const router = createRouter({
         {
           path: '/accounts/add',
           component: AddAccount,
+        },
+        {
+          path: '/tasks/create',
+          component: CreateTasks,
         },
       ],
     },
