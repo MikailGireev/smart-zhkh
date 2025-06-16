@@ -1,9 +1,9 @@
 package api
 
 import (
+	"auth-api/internal/auth"
 	"encoding/json"
 	"net/http"
-	"smart-api/internal/auth"
 )
 
 type LoginRequest struct {

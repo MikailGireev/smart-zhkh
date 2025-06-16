@@ -4,6 +4,7 @@ export async function createCharge(charge: {
   amount: number;
   date: string;
 }) {
+  console.log(charge);
   const res = await fetch('http://localhost:8080/api/charges', {
     method: 'POST',
     headers: {

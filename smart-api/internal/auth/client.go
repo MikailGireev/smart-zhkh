@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 )
 
 const (
@@ -47,70 +46,3 @@ func getAdminToken() (string, error) {
 
 	return tokenResp.AccessToken, nil
 }
-
-func CreateKeycloakUser(username, password, email, first_name, last_name string) error {
-	token, err := getAdminToken()
-	if err != nil {
-		return fmt.Errorf("cannot get admin token: %w", err)
-	}
-
-	userData := map[string]interface{}{
-	"username":       username,
-	"email":          email,
-	"firstName":      first_name,
-	"lastName":       last_name,
-	"enabled":        true,
-	"emailVerified":  true,
-}
-
-	body, _ := json.Marshal(userData)
-	req, _ := http.NewRequest("POST", fmt.Sprintf("%s/admin/realms/%s/users", keycloakBaseURL, realm), bytes.NewBuffer(body))
-	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Content-Type", "application/json")
-
-	client := http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("create user request failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode >= 300 {
-		bodyBytes := new(bytes.Buffer)
-		bodyBytes.ReadFrom(resp.Body)
-		return fmt.Errorf("failed to create user: %s", bodyBytes.String())
-	}
-
-	location := resp.Header.Get("Location")
-	if location == "" {
-		return errors.New("user created but no Location header returned")
-	}
-	parts := strings.Split(location, "/")
-	userID := parts[len(parts)-1]
-
-	passData := map[string]interface{}{
-		"type":      "password",
-		"value":     password,
-		"temporary": false,
-	}
-	passBody, _ := json.Marshal(passData)
-	passReq, _ := http.NewRequest("PUT", fmt.Sprintf("%s/admin/realms/%s/users/%s/reset-password", keycloakBaseURL, realm, userID), bytes.NewBuffer(passBody))
-	passReq.Header.Set("Authorization", "Bearer "+token)
-	passReq.Header.Set("Content-Type", "application/json")
-
-	resp, err = client.Do(passReq)
-	if err != nil {
-		return fmt.Errorf("set password request failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode >= 300 {
-		bodyBytes := new(bytes.Buffer)
-		bodyBytes.ReadFrom(resp.Body)
-		return fmt.Errorf("failed to set password: %s", bodyBytes.String())
-	}
-
-	return nil
-}
-
-

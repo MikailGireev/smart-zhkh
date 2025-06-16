@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"smart-api/internal/auth"
+	"auth-api/internal/auth"
 )
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {

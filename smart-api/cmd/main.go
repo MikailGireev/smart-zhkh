@@ -9,7 +9,6 @@ import (
 
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/api/login", api.LoginHandler)
 	mux.HandleFunc("/api/charges", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
 			api.ChargesHandler(w, r)
@@ -38,7 +37,9 @@ func main() {
 		}
 	})
 	mux.HandleFunc("/api/accounts/", api.AccountsHandlerByUserID)
-	mux.HandleFunc("/api/register", api.RegisterHandler)
+
+	mux.Handle("/api/login", proxy.ProxyAuthService())
+	mux.Handle("/api/register", proxy.ProxyAuthService())
 
 	mux.Handle("/api/v1/tasks", proxy.TaskServiceProxy())
 	mux.Handle("/api/v1/tasks/", proxy.TaskServiceProxy())
