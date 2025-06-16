@@ -1,5 +1,27 @@
 package main
 
+import (
+	"admin-api/task_service/api"
+	"admin-api/task_service/internal/httpx"
+	"admin-api/task_service/internal/middleware"
+	"net/http"
+)
+
 func main() {
-	
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/api/v1/tasks", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			api.GetTasksHandler(w, r)
+		case http.MethodPost:
+			api.PostTasksHandler(w, r)
+		default:
+			httpx.NewJSONError(w, http.StatusMethodNotAllowed, "Method not allowed", "Only GET and POST allowed")
+		}
+	})
+	mux.HandleFunc("/api/v1/tasks/", api.GetTasksHandlerByID)
+
+	handler := middleware.CorsMiddleware(mux)
+	http.ListenAndServe(":8081", handler)
 }
