@@ -20,7 +20,16 @@ func main() {
 			httpx.NewJSONError(w, http.StatusMethodNotAllowed, "Method not allowed", "Only GET and POST allowed")
 		}
 	})
-	mux.HandleFunc("/api/v1/tasks/", api.GetTasksHandlerByID)
+	mux.HandleFunc("/api/v1/tasks/", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			api.GetTasksHandlerByID(w, r)
+		case http.MethodPut:
+			api.PutTasksById(w, r)
+		default:
+			httpx.NewJSONError(w, http.StatusMethodNotAllowed, "Method not allowed", "Only GET and PUT allowed")
+		}
+	})
 
 	handler := middleware.CorsMiddleware(mux)
 	http.ListenAndServe(":8081", handler)

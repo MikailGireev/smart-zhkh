@@ -44,8 +44,22 @@
         <tr v-for="task in filteredTasks" :key="task.id">
           <td>{{ task.id }}</td>
           <td>{{ task.category }}</td>
-          <td>{{ task.title }}</td>
-          <td>{{ task.status }}</td>
+          <td>
+            <router-link :to="`/admin/tasks/${task.id}`" class="task-link">
+              {{ task.title }}
+            </router-link>
+          </td>
+          <td>
+            <span :class="`status-badge ${task.status}`">
+              {{
+                task.status === 'created'
+                  ? 'Создана'
+                  : task.status === 'in_progress'
+                    ? 'В работе'
+                    : 'Выполнена'
+              }}
+            </span>
+          </td>
           <td>{{ formatDate(task.created_at) }}</td>
         </tr>
       </tbody>
@@ -143,5 +157,32 @@ onMounted(loadTasks);
 
 .status.error {
   color: red;
+}
+
+.task-link {
+  color: #2563eb;
+  text-decoration: underline;
+}
+.task-link:hover {
+  text-decoration: none;
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.status-badge.created {
+  background: #fef3c7;
+  color: #b45309;
+}
+.status-badge.in_progress {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+.status-badge.done {
+  background: #dcfce7;
+  color: #15803d;
 }
 </style>

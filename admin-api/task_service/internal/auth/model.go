@@ -26,6 +26,7 @@ type Task struct {
 	Description string `json:"description"`
 	Status string `json:"status"`
 	CreatedAt string `json:"created_at"`
+	ExecutorID  string       `json:"executor_id"`
 	Assignee    Assignee      `json:"assignee"`
 	Attachments []Attachment  `json:"attachments"`
 	History     []HistoryItem `json:"history"`       
