@@ -8,6 +8,8 @@ import { Charges, ChargesAdd } from '@/pages/charges';
 import { Profile, ProfileEdit } from '@/pages/profile';
 import { AddAccount } from '@/pages/account';
 import { CreateTasks } from '@/pages/tasks/intex';
+import AdminLayout from '@/layouts/AdminLayout.vue';
+import { AdminTasks } from '@/pages/admin_tasks';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -62,6 +64,16 @@ const router = createRouter({
         {
           path: '/tasks/create',
           component: CreateTasks,
+        },
+      ],
+    },
+    {
+      path: '/admin',
+      component: AdminLayout,
+      children: [
+        {
+          path: 'tasks',
+          component: AdminTasks,
         },
       ],
     },

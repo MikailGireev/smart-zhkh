@@ -31,5 +31,6 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     isLoggedIn: (state) => !!state.token,
+    accountId: (state) => state.userId,
   },
 });

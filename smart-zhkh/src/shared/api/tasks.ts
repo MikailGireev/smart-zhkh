@@ -1,5 +1,5 @@
 export async function createTask(formData: FormData) {
-  const response = await fetch('/api/v1/tasks', {
+  const response = await fetch('http://localhost:8081/api/v1/tasks', {
     method: 'POST',
     body: formData,
   });

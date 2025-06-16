@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/shared/store/auth';
 import { createTask } from '@/shared/api/tasks';
 
 const router = useRouter();
+const auth = useAuthStore();
 
 const title = ref('');
 const description = ref('');
 const category = ref('');
 const files = ref<File[]>([]);
 const message = ref('');
+
+const accountId = computed(() => auth.accountId || 'user-001'); // заглушка если нет ID
 
 function handleFiles(event: Event) {
   const input = event.target as HTMLInputElement;
@@ -24,6 +28,7 @@ async function submitForm() {
     formData.append('title', title.value);
     formData.append('description', description.value);
     formData.append('category', category.value);
+    formData.append('account_id', accountId.value);
     files.value.forEach((file) => formData.append('attachments', file));
 
     await createTask(formData);
