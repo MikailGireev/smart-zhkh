@@ -110,6 +110,19 @@ func CreateKeycloakUser(username, password, email, first_name, last_name string)
 		return fmt.Errorf("failed to set password: %s", bodyBytes.String())
 	}
 
+	users, err := LoadUser()
+	if err != nil {
+		return err
+	}
+
+	user := User{
+		ID: userID,
+		Username: username,
+	}
+
+	users = append(users, user)
+	SaveUsers(users)
+
 	return nil
 }
 
