@@ -19,7 +19,6 @@ const (
 	adminClientID = "admin-cli"
 )
 
-// getAdminToken — получает токен администратора
 func getAdminToken() (string, error) {
 	data := fmt.Sprintf(
 		"client_id=%s&username=%s&password=%s&grant_type=password",
@@ -49,7 +48,6 @@ func getAdminToken() (string, error) {
 	return tokenResp.AccessToken, nil
 }
 
-// CreateKeycloakUser — создаёт нового пользователя через Admin API
 func CreateKeycloakUser(username, password, email, first_name, last_name string) error {
 	token, err := getAdminToken()
 	if err != nil {
@@ -65,7 +63,6 @@ func CreateKeycloakUser(username, password, email, first_name, last_name string)
 	"emailVerified":  true,
 }
 
-	// 1. Создаем пользователя
 	body, _ := json.Marshal(userData)
 	req, _ := http.NewRequest("POST", fmt.Sprintf("%s/admin/realms/%s/users", keycloakBaseURL, realm), bytes.NewBuffer(body))
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -84,7 +81,6 @@ func CreateKeycloakUser(username, password, email, first_name, last_name string)
 		return fmt.Errorf("failed to create user: %s", bodyBytes.String())
 	}
 
-	// 2. Получаем ID созданного пользователя
 	location := resp.Header.Get("Location")
 	if location == "" {
 		return errors.New("user created but no Location header returned")
@@ -92,7 +88,6 @@ func CreateKeycloakUser(username, password, email, first_name, last_name string)
 	parts := strings.Split(location, "/")
 	userID := parts[len(parts)-1]
 
-	// 3. Устанавливаем пароль
 	passData := map[string]interface{}{
 		"type":      "password",
 		"value":     password,

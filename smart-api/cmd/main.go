@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"smart-api/api"
 	"smart-api/internal/middleware"
+	"smart-api/internal/proxy"
 )
 
 func main() {
@@ -38,6 +39,9 @@ func main() {
 	})
 	mux.HandleFunc("/api/accounts/", api.AccountsHandlerByUserID)
 	mux.HandleFunc("/api/register", api.RegisterHandler)
+
+	mux.Handle("/api/v1/tasks", proxy.TaskServiceProxy())
+	mux.Handle("/api/v1/tasks/", proxy.TaskServiceProxy())
 
 	handler := middleware.CorsMiddleware(mux)
 	http.ListenAndServe(":8080", handler)
