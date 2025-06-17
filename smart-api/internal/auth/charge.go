@@ -17,6 +17,13 @@ var ErrValidation = errors.New("validation failed")
 var ErrNotFound = errors.New("resource not found")
 
 func LoadCharges() ([]Charge, error) {
+	pwd, err := os.Getwd()
+    if err != nil {
+        fmt.Println("Ошибка:", err)
+    }
+
+    fmt.Println("Текущая директория:", pwd)
+	
 	file, err := os.Open(chargeFile)
 	if err != nil {
 		return []Charge{}, err
