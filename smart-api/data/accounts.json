@@ -1,10 +1,1 @@
-[
-    {
-        "id": 1,
-        "user_id": "f3af15a0-9ee1-4409-aa82-82e6eebe97cf",
-        "account_number": "235",
-        "full_name": "dsgsd",
-        "address": "fsdfv",
-        "area": 123
-    }
-]
+[{"id":1,"user_id":"f3af15a0-9ee1-4409-aa82-82e6eebe97cf","account_number":"235","full_name":"dsgsd","address":"fsdfv","area":123},{"id":2,"user_id":"0bde5b66-56ca-4dfd-b4fb-59261f1fc886","account_number":"1321","full_name":"yfyg","address":"grf","area":1230}]

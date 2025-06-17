@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// скрипт оставлен пустым — здесь можно добавить логику позже
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/shared/store/auth';
@@ -12,6 +11,7 @@ const message = ref('');
 
 const auth = useAuthStore();
 const router = useRouter();
+const mode = ref<'user' | 'admin' | null>(null);
 
 async function handleLogin() {
   errors.value = [];
@@ -31,12 +31,16 @@ async function handleLogin() {
     message.value = '❌ ' + (err.message || 'Ошибка входа');
   }
 }
+
+function loginAsAdmin() {
+  auth.login('Администратор', 'admin-token', 'admin-001');
+  router.push('/admin/charges');
+}
 </script>
 
 <template>
   <div class="page-wrapper container">
     <div class="form-card">
-      <!-- Иконка замка -->
       <svg viewBox="0 0 24 24" class="form-icon" aria-hidden="true">
         <rect x="5" y="11" width="14" height="10" rx="2" ry="2" />
         <path d="M12 11V7a4 4 0 0 0-8 0v4" />
@@ -45,7 +49,14 @@ async function handleLogin() {
 
       <h1 class="form-title">Вход в систему</h1>
 
-      <form @submit.prevent="handleLogin" novalidate>
+      <div class="button-group">
+        <button class="button user-button" @click="mode = 'user'">🔒 Войти как пользователь</button>
+        <button class="button admin-button" @click="loginAsAdmin">
+          🛠 Войти как администратор
+        </button>
+      </div>
+
+      <form v-if="mode === 'user'" @submit.prevent="handleLogin" novalidate>
         <div class="form-group">
           <label for="username">Логин</label>
           <input
@@ -68,7 +79,7 @@ async function handleLogin() {
           />
         </div>
 
-        <button type="submit" class="submit-button">🔒 Войти</button>
+        <button type="submit" class="button submit-button">🔒 Войти</button>
       </form>
 
       <ul v-if="errors.length" class="errors">
@@ -82,180 +93,111 @@ async function handleLogin() {
 
 <style scoped>
 .page-wrapper {
-  position: relative;
-  overflow: hidden;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem 1rem;
-  background: linear-gradient(145deg, rgba(37, 99, 235, 0.95) 0%, rgba(29, 78, 216, 0.95) 100%);
-  animation: fadeInUp 0.8s ease;
-}
-.page-wrapper::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-  animation: rotate 20s linear infinite;
-  z-index: 0;
+  background: linear-gradient(145deg, rgba(37, 99, 235, 0.95), rgba(29, 78, 216, 0.95));
 }
 
 .form-card {
-  position: relative;
-  z-index: 10;
-  width: 100%;
   max-width: 400px;
+  width: 100%;
   padding: 3rem 2rem;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.97);
   border-radius: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow:
-    0 10px 20px -5px rgba(0, 0, 0, 0.2),
-    0 6px 10px -4px rgba(0, 0, 0, 0.1),
-    inset 0 1px 2px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
   text-align: center;
-  animation: cardEntrance 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .form-icon {
   width: 3rem;
   height: 3rem;
   margin: 0 auto 1rem;
-  stroke: var(--color-primary);
+  stroke: #2563eb;
   stroke-width: 2;
   fill: none;
-  transition: var(--transition-default);
-}
-.form-icon:hover {
-  transform: scale(1.1);
 }
 
 .form-title {
   font-size: 1.75rem;
   font-weight: 800;
-  color: var(--color-primary-dark);
-  margin-bottom: 1rem;
-  position: relative;
+  margin-bottom: 1.5rem;
 }
-.form-title::after {
-  content: '';
-  position: absolute;
-  bottom: -6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 3px;
-  background: var(--color-primary-light);
-  border-radius: 3px;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.button {
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-button {
+  background: #3b82f6;
+  color: white;
+}
+.user-button:hover {
+  background: #2563eb;
+}
+
+.admin-button {
+  background: #111827;
+  color: white;
+}
+.admin-button:hover {
+  background: #1f2937;
+}
+
+.submit-button {
+  background: #16a34a;
+  color: white;
+  width: 100%;
+}
+.submit-button:hover {
+  background: #15803d;
 }
 
 .form-group {
   margin-bottom: 1.5rem;
   text-align: left;
 }
-
 label {
   display: block;
   margin-bottom: 0.4rem;
-  color: var(--color-text-dark);
   font-weight: 600;
 }
-
 .form-input {
-  width: 100%;
+  width: 90%;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--color-primary-light);
   border-radius: 0.75rem;
+  border: 1px solid #cbd5e1;
   font-size: 1rem;
-  background: var(--color-text-light);
-  transition: var(--transition-default);
-}
-.form-input:focus {
-  border-color: var(--color-primary);
-  outline: none;
-  background: var(--color-bg-light);
-}
-
-.submit-button {
-  width: 100%;
-  padding: 0.75rem;
-  background: var(--color-primary);
-  color: var(--color-text-light);
-  border: none;
-  border-radius: 0.75rem;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: var(--transition-default);
-}
-.submit-button:hover {
-  background: var(--color-primary-dark);
-  transform: translateY(-2px);
 }
 
 .errors {
   margin-top: 1rem;
   list-style: none;
-  color: var(--color-error);
-  font-size: 0.875rem;
+  color: #dc2626;
   text-align: left;
+  font-size: 0.9rem;
   padding-left: 1rem;
 }
 
 .message {
   margin-top: 1rem;
-  color: var(--color-success);
+  color: green;
   font-weight: 600;
-}
-
-@keyframes cardEntrance {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-  .form-card {
-    padding: 2.5rem 1.5rem;
-  }
-  .form-title {
-    font-size: 1.5rem;
-  }
-  .form-input {
-    padding: 0.6rem 0.8rem;
-    font-size: 0.95rem;
-  }
-  .submit-button {
-    font-size: 0.95rem;
-  }
 }
 </style>
