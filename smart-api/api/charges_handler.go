@@ -51,11 +51,18 @@ func CreateChargeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	
+
 	var newCharge auth.Charge
 	if err := json.NewDecoder(r.Body).Decode(&newCharge); err != nil {
 		httpx.NewJSONError(w, http.StatusBadRequest, "Invalid request", "Invalid request")
 		return
 	}
+
+	if err := newCharge.Validate(); err != nil {
+	auth.SendValidationError(w, err)
+	return
+}
 
 	charges, err := auth.LoadCharges()
 	if err != nil {

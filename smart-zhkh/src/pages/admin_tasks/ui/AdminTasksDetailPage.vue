@@ -31,6 +31,26 @@
 
       <button @click="saveChanges">💾 Сохранить изменения</button>
     </div>
+
+    <div class="comments-section">
+      <h3>💬 Комментарии</h3>
+
+      <div v-if="comments.length === 0" class="empty">Нет комментариев</div>
+
+      <ul class="comment-list">
+        <li v-for="(c, index) in comments" :key="index">
+          <p>
+            <strong>{{ c.user }}</strong> ({{ formatDate(c.datetime) }}):
+          </p>
+          <p>{{ c.text }}</p>
+        </li>
+      </ul>
+
+      <div class="comment-form">
+        <textarea v-model="newComment" placeholder="Оставьте комментарий..."></textarea>
+        <button @click="submitComment">➕ Отправить</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -46,6 +66,8 @@ const task = ref<any>(null);
 const users = ref<any[]>([]);
 const loading = ref(true);
 const error = ref('');
+const comments = ref<any[]>([]);
+const newComment = ref('');
 
 async function loadTask() {
   try {
@@ -70,13 +92,6 @@ async function loadUsers() {
       username: 'Админ Иванов',
     },
   ];
-  // try {
-  //   const res = await fetch('http://localhost:8080/api/users');
-  //   if (!res.ok) throw new Error();
-  //   users.value = await res.json();
-  // } catch {
-  //   users.value = [];
-  // }
 }
 
 async function saveChanges() {
@@ -104,9 +119,50 @@ async function saveChanges() {
   }
 }
 
+async function loadComments() {
+  try {
+    const res = await fetch(`http://localhost:8081/api/v1/tasks/comment/${taskId}`);
+    if (res.ok) {
+      comments.value = await res.json();
+    }
+  } catch {
+    comments.value = [];
+  }
+}
+
+async function submitComment() {
+  if (!newComment.value.trim()) return;
+
+  const commentPayload = {
+    task_id: taskId,
+    user: 'admin', // или подставь логин из authStore
+    text: newComment.value.trim(),
+    datetime: new Date().toISOString(),
+  };
+
+  try {
+    const res = await fetch('http://localhost:8081/api/v1/tasks/comment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(commentPayload),
+    });
+    if (res.ok) {
+      newComment.value = '';
+      loadComments();
+    }
+  } catch {
+    alert('❌ Не удалось добавить комментарий');
+  }
+}
+
+function formatDate(str: string) {
+  return new Date(str).toLocaleString();
+}
+
 onMounted(() => {
   loadTask();
   loadUsers();
+  loadComments();
 });
 </script>
 
@@ -180,14 +236,52 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.loading,
-.error {
-  margin-top: 1rem;
-  font-weight: 600;
-  font-size: 1rem;
+.comments-section {
+  margin-top: 2rem;
+  background: #f3f4f6;
+  padding: 1rem;
+  border-radius: 1rem;
 }
 
-.error {
-  color: #dc2626;
+.comments-section h3 {
+  margin-bottom: 1rem;
+}
+
+.comment-list {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 1rem;
+}
+
+.comment-list li {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.comment-form textarea {
+  width: 100%;
+  min-height: 60px;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  font-family: inherit;
+  resize: vertical;
+  margin-bottom: 0.5rem;
+}
+
+.comment-form button {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.comment-form button:hover {
+  background-color: #059669;
 }
 </style>

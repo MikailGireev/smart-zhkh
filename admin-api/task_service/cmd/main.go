@@ -30,6 +30,23 @@ func main() {
 			httpx.NewJSONError(w, http.StatusMethodNotAllowed, "Method not allowed", "Only GET and PUT allowed")
 		}
 	})
+	mux.HandleFunc("/api/v1/tasks/comment/", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			api.GetTaskCommentHandler(w, r)
+		default:
+			httpx.NewJSONError(w, http.StatusMethodNotAllowed, "Method not allowed", "Only GET allowed")
+		}
+	})
+
+	mux.HandleFunc("/api/v1/tasks/comment", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			api.PostTaskCommentHandler(w, r)
+		default:
+			httpx.NewJSONError(w, http.StatusMethodNotAllowed, "Method not allowed", "Only POST allowed")
+		}
+	})
 
 	handler := middleware.CorsMiddleware(mux)
 	http.ListenAndServe(":8081", handler)
