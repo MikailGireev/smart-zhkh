@@ -3,10 +3,15 @@
     <aside class="sidebar">
       <h2 class="logo" @click="goHome">📦 Admin Panel</h2>
       <nav>
-        <RouterLink to="/admin/tasks" class="nav-link" active-class="active">Заявки</RouterLink>
-        <RouterLink to="/admin/settings" class="nav-link" active-class="active"
-          >Настройки</RouterLink
-        >
+        <RouterLink to="/admin/tasks" class="nav-link" active-class="active">
+          🧾 Заявки
+        </RouterLink>
+        <RouterLink to="/admin/charges" class="nav-link" active-class="active">
+          💸 Начисления
+        </RouterLink>
+        <RouterLink to="/admin/settings" class="nav-link" active-class="active">
+          ⚙️ Настройки
+        </RouterLink>
       </nav>
     </aside>
 

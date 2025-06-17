@@ -44,6 +44,9 @@ func main() {
 	mux.Handle("/api/v1/tasks", proxy.TaskServiceProxy())
 	mux.Handle("/api/v1/tasks/", proxy.TaskServiceProxy())
 
+	mux.Handle("/api/charge", proxy.ChargeServerProxy())	
+	mux.Handle("/api/charge/", proxy.ChargeServerProxy())	
+
 	handler := middleware.CorsMiddleware(mux)
 	http.ListenAndServe(":8080", handler)
 }
