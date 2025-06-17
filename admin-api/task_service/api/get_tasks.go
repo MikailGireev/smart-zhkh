@@ -24,6 +24,17 @@ func GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	account_id := r.URL.Query().Get("account_id")
+	if account_id != "" {
+		filtered := []auth.Task{}
+		for _, task := range tasks {
+			if task.AccountId == account_id {
+				filtered = append(filtered, task)
+			}
+		}
+		tasks = filtered
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tasks)

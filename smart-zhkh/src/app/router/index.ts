@@ -10,6 +10,7 @@ import { AddAccount } from '@/pages/account';
 import { CreateTasks } from '@/pages/tasks/intex';
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { AdminTasks, AdminTasksDetail } from '@/pages/admin_tasks';
+import { UserHistory } from '@/pages/user';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -65,6 +66,10 @@ const router = createRouter({
           path: '/tasks/create',
           component: CreateTasks,
         },
+        {
+          path: '/profile/history',
+          component: UserHistory,
+        },
       ],
     },
     {
@@ -78,7 +83,7 @@ const router = createRouter({
         {
           path: 'tasks/:id',
           component: AdminTasksDetail,
-        }
+        },
       ],
     },
   ],

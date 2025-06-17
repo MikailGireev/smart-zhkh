@@ -38,8 +38,12 @@ function formatDate(date: string) {
     <div class="user-info">
       <p><strong>Пользователь:</strong> {{ auth.username }}</p>
     </div>
-
-    <h3 class="section-title">Ваши счета</h3>
+    <h3 class="section-title">
+      Ваши счета
+      <RouterLink to="/profile/history" class="btn btn-primary" style="margin-left: 1rem">
+        📋 История заявок
+      </RouterLink>
+    </h3>
 
     <div v-if="isLoading" class="loading">⏳ Загрузка...</div>
 
