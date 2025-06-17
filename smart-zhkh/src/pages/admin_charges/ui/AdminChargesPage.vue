@@ -18,6 +18,7 @@
     <table class="charges-table">
       <thead>
         <tr>
+          <th>ФИО</th>
           <th>Счёт</th>
           <th>Категория</th>
           <th>Сумма</th>

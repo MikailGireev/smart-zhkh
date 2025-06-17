@@ -14,6 +14,7 @@ func main() {
 
 	r.POST("/api/v1/charges", handlers.CreateTransaction)
 	r.GET("/api/v1/charges", handlers.GetTransactions)
+	r.PUT("/api/v1/charges/:id", handlers.PutTransaction)
 
 	r.Run(":7070")
 }

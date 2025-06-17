@@ -28,6 +28,21 @@ func readTransactions() ([]Transaction, error) {
 	return txs, err
 }
 
+func readAccounts() ([]Account, error) {
+	var accs []Account
+
+	if _, err := os.Stat(accountsFilePath); os.IsNotExist(err) {
+		return accs, nil
+	}
+
+	data, err := ioutil.ReadFile(accountsFilePath)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(data, &accs)
+	return accs, err
+}
+
 func writeTransactions(txs []Transaction) error {
 	data, err := json.MarshalIndent(txs, "", "  ")
 	if err != nil {
@@ -78,16 +93,27 @@ func CreateTransaction(c *gin.Context) {
 	c.JSON(http.StatusOK, tx)
 }
 
-
 func GetTransactions(c *gin.Context) {
 	txs, err := readTransactions()
 	if err != nil {
 		log.Errorf("Read error: %v", err)
-		httpx.NewJSONError(c.Writer, http.StatusInternalServerError, "Failed to read file", err.Error())
+		httpx.NewJSONError(c.Writer, http.StatusInternalServerError, "Failed to read transactions", err.Error())
 		return
 	}
 
-	var result []Transaction
+	accounts, err := readAccounts()
+	if err != nil {
+		log.Errorf("Accounts read error: %v", err)
+		httpx.NewJSONError(c.Writer, http.StatusInternalServerError, "Failed to read accounts", err.Error())
+		return
+	}
+
+	accountMap := make(map[string]Account)
+	for _, acc := range accounts {
+		accountMap[acc.UserID] = acc
+	}
+
+	var result []TransactionResponse
 	for _, tx := range txs {
 		match := true
 
@@ -97,6 +123,7 @@ func GetTransactions(c *gin.Context) {
 				match = false
 			}
 		}
+		
 		if v := c.Query("user_id"); v != "" && tx.UserID != v {
 			match = false
 		}
@@ -119,11 +146,77 @@ func GetTransactions(c *gin.Context) {
 			}
 		}
 
+		acc := accountMap[tx.UserID]
+		if v := c.Query("account_number"); v != "" && acc.AccountNumber != v {
+			match = false
+		}
+		if v := c.Query("full_name"); v != "" && acc.FullName != v {
+			match = false
+		}
+		if v := c.Query("address"); v != "" && acc.Address != v {
+			match = false
+		}
+		if v := c.Query("area"); v != "" {
+			a, _ := strconv.Atoi(v)
+			if acc.Area != a {
+				match = false
+			}
+		}
+
 		if match {
-			result = append(result, tx)
+			result = append(result, TransactionResponse{
+				Transaction:   tx,
+				UserName: acc.FullName,
+				AccountNumber: acc.AccountNumber,
+			})
 		}
 	}
 
 	log.Info("Returned %d filtered transactions", len(result))
 	c.JSON(http.StatusOK, result)
+}
+
+
+func PutTransaction(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		httpx.NewJSONError(c.Writer, http.StatusBadRequest, "Invalid ID", err.Error())
+		return
+	}
+
+	var updatedTx Transaction
+	if err := c.ShouldBindJSON(&updatedTx); err != nil {
+		httpx.NewJSONError(c.Writer, http.StatusBadRequest, "Invalid JSON", err.Error())
+		return
+	}
+
+	txs, err := readTransactions()
+	if err != nil {
+		httpx.NewJSONError(c.Writer, http.StatusInternalServerError, "Failed to read file", err.Error())
+		return
+	}
+
+	found := false
+	for i, tx := range txs {
+		if tx.ID == uint(id) {
+			updatedTx.ID = tx.ID
+			txs[i] = updatedTx
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		httpx.NewJSONError(c.Writer, http.StatusNotFound, "Transaction not found", "")
+		return
+	}
+
+	if err := writeTransactions(txs); err != nil {
+		httpx.NewJSONError(c.Writer, http.StatusInternalServerError, "Failed to write data", err.Error())
+		return
+	}
+
+	log.Info("Transaction updated: %+v", updatedTx)
+	c.JSON(http.StatusOK, updatedTx)
 }
